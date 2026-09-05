@@ -1,5 +1,6 @@
 import Shop from "../models/Shop.js";
 import Product from "../models/Product.js";
+import Instrument from "../models/Instrument.js";
 import { generateQR } from "../utils/qr.js";
 import { haversineDistance } from "../utils/distance.js";
 
@@ -79,7 +80,13 @@ export const getNearbyShops = async (req, res) => {
 // sorted by distance from this inspector's own base location, for the
 // self-serve "pick a shop to inspect yourself" flow.
 export const getShopsNeedingInspection = async (req, res) => {
-  const shops = await Shop.find({ complianceStatus: { $in: ["unverified", "non-compliant"] } });
+  const unverifiedInstrumentShopIds = await Instrument.find({
+    verificationStatus: { $in: ["unverified", "rejected", "expired"] },
+  }).distinct("shop");
+  const shops = await Shop.find({ $or: [ { complianceStatus: { $in: ["unverified", "non-compliant"] } },
+   { _id: { $in: unverifiedInstrumentShopIds } },
+  ],
+});  
   const base = req.user.baseLocation;
 
   const withDistance = shops.map((s) => {

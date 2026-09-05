@@ -42,6 +42,13 @@ export const addInstrument = async (req, res) => {
     instrument.qrCode = await generateQR("instrument", instrument.qrId);
     await instrument.save();
 
+// If the shop was previously compliant, adding a new instrument
+// means the shop needs inspection again.
+if (shop.complianceStatus === "compliant") {
+  shop.complianceStatus = "pending";
+  await shop.save();
+}
+
     res.status(201).json({ instrument });
   } catch (err) {
     res.status(500).json({ message: err.message });

@@ -40,7 +40,9 @@ export const verifyByQr = async (req, res) => {
     }
 
     if (type === "certificate") {
-      const cert = await Certificate.findOne({ certificateId: id }).populate("shop").populate("instruments");
+      const cert = await Certificate.findOne({ certificateId: id })
+        .populate({ path: "shop", populate: { path: "owner", select: "name email phone" } })
+        .populate("instruments");
       if (!cert) return res.status(404).json({ message: "Certificate not found" });
       const currentlyValid = cert.validUntil > new Date() && cert.status === "active" && verifyCertificateIntegrity(cert);
       return res.json({ type: "certificate", certificate: cert, currentlyValid, integrityVerified: verifyCertificateIntegrity(cert) });
@@ -51,3 +53,4 @@ export const verifyByQr = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+ 

@@ -41,6 +41,7 @@ export const issueCertificateForInspection = async ({ shopId, instrumentIds, ins
 // @route GET /api/certificates/shop/:shopId
 export const getCertificatesByShop = async (req, res) => {
   const certs = await Certificate.find({ shop: req.params.shopId })
+    .populate({ path: "shop", populate: { path: "owner", select: "name email phone" } })
     .populate("issuedBy", "name email")
     .populate("instruments")
     .sort({ createdAt: -1 });
@@ -50,7 +51,7 @@ export const getCertificatesByShop = async (req, res) => {
 // @route GET /api/certificates/:certificateId  (public-safe fields only; full detail via /verify)
 export const getCertificateById = async (req, res) => {
   const cert = await Certificate.findOne({ certificateId: req.params.certificateId })
-    .populate("shop")
+    .populate({ path: "shop", populate: { path: "owner", select: "name email phone" } })
     .populate("issuedBy", "name")
     .populate("instruments");
   if (!cert) return res.status(404).json({ message: "Certificate not found" });

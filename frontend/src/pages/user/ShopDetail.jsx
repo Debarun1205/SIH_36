@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "../../api/axios.js";
 import EvidenceCapture from "../../components/EvidenceCapture.jsx";
+import CertificateDocument from "../../components/CertificateDocument.jsx";
 
 export default function ShopDetail() {
   const { id } = useParams();
@@ -381,18 +382,9 @@ function ApplyTab({ shopId, applications, onApplied }) {
 
 function CertificatesTab({ certificates }) {
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-8">
       {certificates.map((c) => (
-        <div key={c._id} className="card flex items-center justify-between">
-          <div>
-            <p className="font-mono text-sm">{c.certificateId}</p>
-            <p className="text-sm text-ink/60">
-              Valid: {new Date(c.issueDate).toLocaleDateString()} – {new Date(c.validUntil).toLocaleDateString()}
-            </p>
-            <span className={c.status === "active" ? "seal-compliant" : "seal-noncompliant"}>{c.status}</span>
-          </div>
-          {c.qrCode && <img src={c.qrCode} className="w-20 h-20" alt="certificate qr" />}
-        </div>
+        <CertificateDocument key={c._id} certificate={c} />
       ))}
       {certificates.length === 0 && <p className="text-ink/50 text-center py-8">No certificates issued yet.</p>}
     </div>
