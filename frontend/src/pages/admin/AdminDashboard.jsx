@@ -448,31 +448,121 @@ function ToleranceRules() {
   );
 }
 
+// Turns the raw inspector-vs-OCR data into a single plain-language line a
+// non-technical government official can act on without parsing numbers or
+// raw OCR text themselves.
+const plainLanguageVerdict = (c) => {
+  if (c.ocrValueParsed == null) {
+    return { icon: "❓", tone: "text-warn", text: "The photo didn't clearly show a readable number — a person needs to check it." };
+  }
+  if (c.ocrMatchesInspector) {
+    return {
+      icon: "✅",
+      tone: "text-ok",
+      text: `The photo confirms the inspector's reading of ${c.observedValue}${c.unit ? " " + c.unit : ""}.`,
+    };
+  }
+  return {
+    icon: "⚠️",
+    tone: "text-danger",
+    text: `The photo appears to show ${c.ocrValueParsed}${c.unit ? " " + c.unit : ""}, but the inspector recorded ${c.observedValue}${c.unit ? " " + c.unit : ""} — these don't match.`,
+  };
+};
+
 function ReviewQueue() {
   const [inspections, setInspections] = useState([]);
+  const [expandedRaw, setExpandedRaw] = useState({});
+  const [notes, setNotes] = useState({});
+  const [error, setError] = useState("");
+  const [submittingId, setSubmittingId] = useState(null);
+
+  const load = () => api.get("/inspections/review-queue").then((res) => setInspections(res.data.inspections));
 
   useEffect(() => {
-    api.get("/inspections/review-queue").then((res) => setInspections(res.data.inspections));
+    load();
   }, []);
+
+  const resolve = async (id, decision) => {
+    setSubmittingId(id);
+    setError("");
+    try {
+      await api.patch(`/inspections/${id}/resolve-review`, { decision, adminNotes: notes[id] });
+      load();
+    } catch (err) {
+      setError(err.response?.data?.message || "Could not resolve this case");
+    } finally {
+      setSubmittingId(null);
+    }
+  };
 
   return (
     <div className="grid gap-3">
+      <p className="text-sm text-ink/60">
+        These are cases where the inspector's declared reading and the photo's automatic reading
+        disagreed — the system deliberately doesn't auto-decide these. Review the evidence below and
+        make the final call.
+      </p>
+      {error && <p className="text-danger text-sm">{error}</p>}
       {inspections.map((insp) => (
         <div key={insp._id} className="card">
           <div className="flex items-center justify-between mb-2">
             <p className="font-medium">{insp.shop?.shopName}</p>
             <span className="seal-pending">REVIEW REQUIRED</span>
           </div>
-          <p className="text-sm text-ink/60 mb-2">Inspector: {insp.inspector?.name}</p>
-          {insp.measurementChecks?.map((c, idx) => (
-            <div key={idx} className="text-sm border-t border-line pt-2 mt-2">
-              <p>
-                Inspector-declared: <span className="font-mono">{c.observedValue}</span> · OCR-read:{" "}
-                <span className="font-mono">{c.ocrExtractedReading || "n/a"}</span>
-              </p>
-              {c.evidenceImage && <img src={c.evidenceImage} alt="evidence" className="w-24 h-24 mt-2 rounded-sm border border-line" />}
+          <p className="text-sm text-ink/60 mb-3">Inspector: {insp.inspector?.name}</p>
+
+          {insp.measurementChecks?.map((c, idx) => {
+            const verdict = plainLanguageVerdict(c);
+            const key = `${insp._id}-${idx}`;
+            return (
+              <div key={idx} className="text-sm border-t border-line pt-3 mt-3 flex gap-4">
+                {c.evidenceImage && (
+                  <img src={c.evidenceImage} alt="evidence" className="w-20 h-20 rounded-sm border border-line flex-shrink-0" />
+                )}
+                <div className="flex-1">
+                  <p className={`font-medium ${verdict.tone}`}>
+                    {verdict.icon} {verdict.text}
+                  </p>
+                  <button
+                    onClick={() => setExpandedRaw((s) => ({ ...s, [key]: !s[key] }))}
+                    className="text-xs text-ink/40 hover:underline mt-1"
+                  >
+                    {expandedRaw[key] ? "Hide technical details" : "Show technical details"}
+                  </button>
+                  {expandedRaw[key] && (
+                    <p className="text-xs font-mono text-ink/50 mt-1 bg-paperdim/50 rounded-sm p-2">
+                      Raw OCR text: {c.ocrExtractedReading || "(none detected)"}
+                    </p>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+
+          <div className="border-t border-line pt-3 mt-3">
+            <input
+              className="field-input mb-2 text-sm"
+              placeholder="Optional note explaining your decision"
+              value={notes[insp._id] || ""}
+              onChange={(e) => setNotes({ ...notes, [insp._id]: e.target.value })}
+            />
+            <div className="flex gap-2 justify-end">
+              <button
+                className="btn-outline !py-1.5"
+                disabled={submittingId === insp._id}
+                onClick={() => resolve(insp._id, "non-compliant")}
+              >
+                Reject — non-compliant
+              </button>
+              <button
+                className="btn-brass !py-1.5"
+                disabled={submittingId === insp._id}
+                onClick={() => resolve(insp._id, "compliant")}
+              >
+                Approve — issue certificate
+              </button>
             </div>
-          ))}
+          </div>
         </div>
       ))}
       {inspections.length === 0 && <p className="text-ink/50 text-center py-8">No cases pending review.</p>}

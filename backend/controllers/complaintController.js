@@ -24,6 +24,20 @@ export const submitComplaint = async (req, res) => {
   }
 };
 
+// @route GET /api/complaints/track/:id  (public - for citizens without an
+// account who only have the reference ID shown after submitting)
+export const trackComplaint = async (req, res) => {
+  try {
+    const complaint = await Complaint.findById(req.params.id)
+      .select("issueType status resolutionNotes createdAt shop")
+      .populate("shop", "shopName city");
+    if (!complaint) return res.status(404).json({ message: "No report found with that reference ID" });
+    res.json({ complaint });
+  } catch {
+    res.status(404).json({ message: "No report found with that reference ID" });
+  }
+};
+
 // @route GET /api/complaints/mine  (role: citizen)
 export const listMyComplaints = async (req, res) => {
   const complaints = await Complaint.find({ citizen: req.user._id }).populate("shop", "shopName city").sort({ createdAt: -1 });

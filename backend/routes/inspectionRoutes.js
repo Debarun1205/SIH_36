@@ -7,6 +7,7 @@ import {
   getReviewQueue,
   getVerificationTrends,
   selfAssignInspection,
+  resolveReviewCase,
 } from "../controllers/inspectionController.js";
 import { protect, authorize } from "../middleware/auth.js";
 
@@ -18,6 +19,7 @@ router.get("/mine", protect, authorize("user", "inspector"), getMyInspections);
 router.patch("/:id/complete", protect, authorize("inspector"), completeInspection);
 router.get("/analytics", protect, authorize("admin"), getAnalytics);
 router.get("/review-queue", protect, authorize("admin"), getReviewQueue);
+router.patch("/:id/resolve-review", protect, authorize("admin"), resolveReviewCase);
 router.get("/trends", protect, authorize("admin"), getVerificationTrends);
 
 export default router;

@@ -234,6 +234,53 @@ export const selfAssignInspection = async (req, res) => {
   }
 };
 
+// @route PATCH /api/inspections/:id/resolve-review  (role: admin)
+// The missing action on the review queue: an admin makes the final call on a
+// case where the inspector's declared reading disagreed with the OCR-read
+// value, since the system deliberately refuses to auto-decide those.
+export const resolveReviewCase = async (req, res) => {
+  try {
+    const { decision, adminNotes } = req.body; // "compliant" | "non-compliant"
+    if (!["compliant", "non-compliant"].includes(decision)) {
+      return res.status(400).json({ message: "decision must be 'compliant' or 'non-compliant'" });
+    }
+
+    const inspection = await Inspection.findById(req.params.id);
+    if (!inspection) return res.status(404).json({ message: "Inspection not found" });
+    if (inspection.result !== "review-required") {
+      return res.status(409).json({ message: "This case is not awaiting review" });
+    }
+
+    inspection.result = decision;
+    inspection.remarks = [inspection.remarks, adminNotes && `Admin review: ${adminNotes}`].filter(Boolean).join(" | ");
+    await inspection.save();
+
+    const instrumentIds = inspection.instrumentsChecked || [];
+    if (instrumentIds.length) {
+      await Instrument.updateMany(
+        { _id: { $in: instrumentIds } },
+        { verificationStatus: decision === "compliant" ? "verified" : "rejected", lastVerifiedDate: new Date() }
+      );
+    }
+
+    let certificate = null;
+    if (decision === "compliant") {
+      certificate = await issueCertificateForInspection({
+        shopId: inspection.shop,
+        instrumentIds,
+        inspectionId: inspection._id,
+        inspectorId: inspection.inspector,
+      });
+    } else {
+      await Shop.findByIdAndUpdate(inspection.shop, { complianceStatus: "non-compliant" });
+    }
+
+    res.json({ inspection, certificate });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 export const getReviewQueue = async (req, res) => {
   const inspections = await Inspection.find({ result: "review-required" })
     .populate("shop", "shopName city state")
