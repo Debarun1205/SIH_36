@@ -1,18 +1,6 @@
-<div align="center">
+# MaanVerify — Online Verification System for Weighing & Measuring Instruments
 
-# MaanVerify
-
-### Online Verification System for Weighing and Measuring Instruments
-
-**SIH prototype (PS SIH26036 · Ministry of Consumer Affairs, Dept. of Consumer Affairs)**
-
-[![CI](https://img.shields.io/badge/CI-passing-brightgreen)](#)
-[![License](https://img.shields.io/badge/license-MIT-blue)](#license)
-[![Node](https://img.shields.io/badge/node-20.x-339933?logo=node.js&logoColor=white)](#tech-stack)
-[![NestJS](https://img.shields.io/badge/backend-NestJS-E0234E?logo=nestjs&logoColor=white)](#tech-stack)
-[![MongoDB](https://img.shields.io/badge/database-MongoDB-47A248?logo=mongodb&logoColor=white)](#tech-stack)
-
-
+SIH prototype (PS SIH26036 · Ministry of Consumer Affairs, Dept. of Consumer Affairs).
 A digital lifecycle platform for legal-metrology verification: businesses register
 instruments, inspectors are matched by location/time slot, tamper-evident digital
 certificates are issued with QR codes, and citizens can instantly verify a shop's
@@ -20,8 +8,6 @@ compliance status.
 
 **Everything here runs on free tiers and free/open-source tooling — no paid API keys
 required anywhere in the stack.**
-
-</div>
 
 ## What's built vs. what's a lightweight stand-in
 
@@ -101,7 +87,30 @@ instruments with optional nameplate OCR, **list the items they sell** (shown
 to citizens browsing nearby and on the shop's public QR page), and choose
 between booking a slot themselves or requesting hand-down assignment.
 
+**Government official/inspector registration is discoverable** from the
+Login page, Register page, and homepage — all link to `/register-official`.
+
+**Inspector registration now also requires a government ID photo** (uploaded
+as part of the same form, stored alongside their location and slots) — an
+admin reviews this thumbnail directly in the Inspector Approvals tab before
+approving or rejecting the account.
+
+**Context-aware chatbot:** every logged-in role gets a floating assistant
+(bottom-right corner). It's role-scoped *by construction*, not just by
+prompt instruction — the backend (`chatController.js`) builds a small context
+string per request using only data the requesting `req.user` is entitled to
+(their own shops, their own complaints, their own assignments, or
+platform-wide aggregates for admins) and that's the only data ever handed to
+the model. A shop owner's assistant session cannot see another shop's data,
+citizen complaint details, or inspector/government information, and vice
+versa. It uses Groq's free-tier API (`GROQ_API_KEY` in `.env` — get one free
+at console.groq.com) rather than a paid LLM API.
+
 **Government dashboard** (the `admin` role) covers: live compliance summary,
+an 8-week verification-trends chart, inspector approval queue (with ID photo
+review), the hand-down assignment queue, a GIS compliance map (Leaflet/OSM),
+inspector account management, configurable per-instrument tolerance rules,
+the OCR-conflict review queue, and citizen complaint triage.
 an 8-week verification-trends chart, inspector approval queue, the
 hand-down assignment queue, a GIS compliance map (Leaflet/OSM), inspector
 account management, configurable per-instrument tolerance rules, the

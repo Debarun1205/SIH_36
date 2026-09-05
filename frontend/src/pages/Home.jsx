@@ -21,6 +21,12 @@ export default function Home() {
           Verify an instrument
         </Link>
       </div>
+      <p className="text-sm text-ink/50 mt-6">
+        Government official or inspector?{" "}
+        <Link to="/register-official" className="text-brass hover:underline">
+          Register here
+        </Link>
+      </p>
     </div>
   );
 }

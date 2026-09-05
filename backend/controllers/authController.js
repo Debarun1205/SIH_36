@@ -31,7 +31,7 @@ const sanitize = (user) => ({
 //                       until a govt admin approves them
 export const register = async (req, res) => {
   try {
-    const { name, email, password, phone, role, baseLocation, slots } = req.body;
+    const { name, email, password, phone, role, baseLocation, slots, govtIdDocument } = req.body;
     if (!name || !email || !password) {
       return res.status(400).json({ message: "Name, email and password are required" });
     }
@@ -53,6 +53,9 @@ export const register = async (req, res) => {
       if (!Array.isArray(slots) || slots.length === 0) {
         return res.status(400).json({ message: "Please add at least one available time slot" });
       }
+      if (!govtIdDocument) {
+        return res.status(400).json({ message: "Please upload a photo of your government-issued inspector ID" });
+      }
     }
 
     const existing = await User.findOne({ email: normalizedEmail });
@@ -67,6 +70,7 @@ export const register = async (req, res) => {
       phone,
       role: finalRole,
       baseLocation: finalRole === "inspector" ? baseLocation : undefined,
+      govtIdDocument: finalRole === "inspector" ? govtIdDocument : undefined,
       approvalStatus: finalRole === "inspector" ? "pending" : "approved",
     });
 

@@ -9,7 +9,20 @@ export default function RegisterOfficial() {
   const [form, setForm] = useState({ name: "", email: "", password: "", phone: "" });
   const [location, setLocation] = useState({ city: "", state: "", lat: "", lng: "" });
   const [slots, setSlots] = useState([{ date: "", startTime: "09:00", endTime: "10:00" }]);
+  const [govtIdDocument, setGovtIdDocument] = useState(null);
+  const [govtIdPreview, setGovtIdPreview] = useState(null);
   const [submitted, setSubmitted] = useState(false);
+
+  const handleIdUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      setGovtIdDocument(reader.result);
+      setGovtIdPreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
   const setLoc = (k) => (e) => setLocation({ ...location, [k]: e.target.value });
@@ -41,6 +54,7 @@ export default function RegisterOfficial() {
               lng: location.lng ? parseFloat(location.lng) : undefined,
             },
             slots,
+            govtIdDocument,
           }
         : {}),
     };
@@ -178,11 +192,26 @@ export default function RegisterOfficial() {
                 + Add another slot
               </button>
             </div>
+
+            <div className="border-t border-line pt-4">
+              <label className="field-label">Government-issued inspector ID</label>
+              <p className="text-xs text-ink/50 mb-2">
+                Upload a clear photo or scan of your official ID card — an admin reviews this before
+                approving your account.
+              </p>
+              <input type="file" accept="image/*,.pdf" onChange={handleIdUpload} className="text-sm" required />
+              {govtIdPreview && govtIdPreview.startsWith("data:image") && (
+                <img src={govtIdPreview} alt="ID preview" className="w-32 h-32 object-cover rounded-sm border border-line mt-2" />
+              )}
+              {govtIdPreview && !govtIdPreview.startsWith("data:image") && (
+                <p className="text-xs text-ok mt-2">File attached.</p>
+              )}
+            </div>
           </>
         )}
 
         {error && <p className="text-danger text-sm">{error}</p>}
-        <button className="btn-primary w-full" disabled={loading}>
+        <button className="btn-primary w-full" disabled={loading || (role === "inspector" && !govtIdDocument)}>
           {loading ? "Submitting…" : role === "admin" ? "Register as government official" : "Submit for approval"}
         </button>
       </form>

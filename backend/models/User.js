@@ -27,6 +27,9 @@ const userSchema = new mongoose.Schema(
       lat: Number,
       lng: Number,
     },
+    // Required only for self-registered inspectors: a photo/scan of their
+    // government-issued inspector ID, reviewed by an admin before approval.
+    govtIdDocument: { type: String, default: null },
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true }

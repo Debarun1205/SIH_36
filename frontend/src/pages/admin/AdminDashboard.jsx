@@ -143,12 +143,22 @@ function InspectorApprovals() {
       <div className="grid gap-3">
         {pending.map((i) => (
           <div key={i._id} className="card flex items-center justify-between">
-            <div>
-              <p className="font-medium">{i.name}</p>
-              <p className="text-sm text-ink/60">{i.email} · {i.phone}</p>
-              <p className="text-xs text-ink/50 mt-1">
-                Base location: {i.baseLocation?.city}, {i.baseLocation?.state}
-              </p>
+            <div className="flex gap-4 items-center">
+              {i.govtIdDocument && i.govtIdDocument.startsWith("data:image") && (
+                <img src={i.govtIdDocument} alt="Govt ID" className="w-16 h-16 object-cover rounded-sm border border-line" />
+              )}
+              <div>
+                <p className="font-medium">{i.name}</p>
+                <p className="text-sm text-ink/60">{i.email} · {i.phone}</p>
+                <p className="text-xs text-ink/50 mt-1">
+                  Base location: {i.baseLocation?.city}, {i.baseLocation?.state}
+                </p>
+                {i.govtIdDocument && !i.govtIdDocument.startsWith("data:image") && (
+                  <a href={i.govtIdDocument} target="_blank" rel="noreferrer" className="text-xs text-brass hover:underline">
+                    View uploaded ID document
+                  </a>
+                )}
+              </div>
             </div>
             <div className="flex gap-2">
               <button className="btn-outline !py-1.5" onClick={() => decide(i._id, "reject")}>

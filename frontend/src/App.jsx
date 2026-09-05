@@ -2,6 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import ChatWidget from "./components/ChatWidget.jsx";
 
 import Home from "./pages/Home.jsx";
 import Login from "./pages/Login.jsx";
@@ -100,6 +101,7 @@ export default function App() {
       <footer className="border-t border-line py-6 text-center text-xs text-ink/40">
         MaanVerify — SIH prototype for online verification of weighing &amp; measuring instruments
       </footer>
+      <ChatWidget />
     </div>
   );
 }
