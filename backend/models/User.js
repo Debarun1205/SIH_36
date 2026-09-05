@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema(
     phone: { type: String, trim: true },
     role: {
       type: String,
-      enum: ["user", "inspector", "admin"],
+      enum: ["user", "citizen", "inspector", "admin"],
       default: "user",
     },
     // Only relevant for inspectors: the base city/state they operate from

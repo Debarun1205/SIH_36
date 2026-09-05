@@ -1,10 +1,11 @@
 import express from "express";
-import { submitComplaint, listComplaints, updateComplaintStatus } from "../controllers/complaintController.js";
-import { protect, authorize } from "../middleware/auth.js";
+import { submitComplaint, listComplaints, updateComplaintStatus, listMyComplaints } from "../controllers/complaintController.js";
+import { protect, authorize, optionalAuth } from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.post("/", submitComplaint); // public - citizens may not have an account
+router.post("/", optionalAuth, submitComplaint); // public - citizens may or may not be logged in
+router.get("/mine", protect, authorize("citizen"), listMyComplaints);
 router.get("/", protect, authorize("admin", "inspector"), listComplaints);
 router.patch("/:id", protect, authorize("admin", "inspector"), updateComplaintStatus);
 

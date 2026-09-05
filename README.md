@@ -45,14 +45,33 @@ SIH_36/
 └── frontend/    React + Vite + Tailwind CSS
 ```
 
-**Roles:** `user` (shop/business owner), `inspector`, `admin`. JWT-based auth with
-role-based access control on every protected route.
+**Roles:** `user` (shop/business owner), `citizen` (consumer), `inspector`, `admin`
+(government/department staff). JWT-based auth with role-based access control on
+every protected route. `user` and `citizen` are open self-signup; `inspector`
+and `admin` accounts can only be created by an existing admin.
+
+**Two ways a shop gets inspected:**
+1. **Self-service booking** — shop owner browses open inspector time slots
+   (nearest-first if they share their location) and books one directly.
+2. **Hand-down / assignment** — shop owner just "requests" an inspection with
+   no slot picked (`Application` model). An admin sees the queue, gets a
+   ranked shortlist of inspectors (same city first, then distance, then
+   lowest current workload), picks one, and assigns a date/time in one step —
+   this is the government-staff-driven assignment path from the PRD (FR-05).
 
 **Core flow:** user registers a shop → adds instruments (with optional nameplate OCR)
-→ books an open inspector time slot (nearest-first if you share your location) →
+→ either books a slot themselves or requests an inspection for admin hand-down →
 inspector conducts the inspection, entering measurements and photographing the display
 → system cross-checks OCR vs. declared reading → compliant results auto-issue a
-tamper-evident certificate with QR → citizens scan the QR to verify instantly.
+tamper-evident certificate with QR → citizens (with or without an account) scan
+the QR to verify instantly, and can optionally create a citizen account to track
+the status of complaints they've filed.
+
+**Government dashboard** (the `admin` role) covers: live compliance summary,
+an 8-week verification-trends chart, the assignment queue above, a GIS
+compliance map (Leaflet/OSM), inspector account management, configurable
+per-instrument tolerance rules, the OCR-conflict review queue, and citizen
+complaint triage.
 
 ## Local setup
 

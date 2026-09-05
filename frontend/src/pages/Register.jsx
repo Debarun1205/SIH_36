@@ -5,22 +5,43 @@ import { useAuth } from "../context/AuthContext.jsx";
 export default function Register() {
   const { register, loading, error } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: "", email: "", password: "", phone: "" });
+  const [form, setForm] = useState({ name: "", email: "", password: "", phone: "", role: "user" });
 
   const submit = async (e) => {
     e.preventDefault();
     const user = await register(form).catch(() => null);
-    if (user) navigate("/user");
+    if (user) navigate(user.role === "citizen" ? "/citizen" : "/user");
   };
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
   return (
     <div className="max-w-md mx-auto mt-16 px-6">
-      <h1 className="text-2xl mb-1">Register your business</h1>
+      <h1 className="text-2xl mb-1">Create an account</h1>
       <p className="text-ink/60 text-sm mb-6">
-        Create an account to register instruments and track verification status.
+        Register instruments and track verification status, or sign up to track your complaints.
       </p>
+
+      <div className="flex gap-2 mb-5">
+        <button
+          type="button"
+          onClick={() => setForm({ ...form, role: "user" })}
+          className={`flex-1 py-2 text-sm rounded-sm border ${
+            form.role === "user" ? "bg-ink text-paper border-ink" : "border-line text-ink/60"
+          }`}
+        >
+          Business / Shop Owner
+        </button>
+        <button
+          type="button"
+          onClick={() => setForm({ ...form, role: "citizen" })}
+          className={`flex-1 py-2 text-sm rounded-sm border ${
+            form.role === "citizen" ? "bg-ink text-paper border-ink" : "border-line text-ink/60"
+          }`}
+        >
+          Citizen / Consumer
+        </button>
+      </div>
 
       <form onSubmit={submit} className="card space-y-4">
         <div>

@@ -7,6 +7,7 @@ const complaintSchema = new mongoose.Schema(
       name: String,
       contact: String,
     },
+    citizen: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
     shop: { type: mongoose.Schema.Types.ObjectId, ref: "Shop" },
     instrument: { type: mongoose.Schema.Types.ObjectId, ref: "Instrument" },
     issueType: {

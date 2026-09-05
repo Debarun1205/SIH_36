@@ -14,6 +14,8 @@ import UserDashboard from "./pages/user/UserDashboard.jsx";
 import RegisterShop from "./pages/user/RegisterShop.jsx";
 import ShopDetail from "./pages/user/ShopDetail.jsx";
 
+import CitizenDashboard from "./pages/citizen/CitizenDashboard.jsx";
+
 import InspectorDashboard from "./pages/inspector/InspectorDashboard.jsx";
 import CompleteInspection from "./pages/inspector/CompleteInspection.jsx";
 
@@ -53,6 +55,15 @@ export default function App() {
             element={
               <ProtectedRoute roles={["user"]}>
                 <ShopDetail />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/citizen"
+            element={
+              <ProtectedRoute roles={["citizen"]}>
+                <CitizenDashboard />
               </ProtectedRoute>
             }
           />

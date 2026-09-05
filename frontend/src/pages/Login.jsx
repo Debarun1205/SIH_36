@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 
-const roleHome = { user: "/user", inspector: "/inspector", admin: "/admin" };
+const roleHome = { user: "/user", citizen: "/citizen", inspector: "/inspector", admin: "/admin" };
 
 export default function Login() {
   const { login, loading, error } = useAuth();

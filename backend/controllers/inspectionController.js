@@ -173,7 +173,30 @@ export const completeInspection = async (req, res) => {
   }
 };
 
-// @route GET /api/inspections/review-queue  (role: admin)
+// @route GET /api/inspections/trends  (role: admin)
+// Certificates issued per week over the last 8 weeks - the "verification
+// trends" chart the government dashboard needs.
+export const getVerificationTrends = async (req, res) => {
+  const WEEKS = 8;
+  const now = new Date();
+  const buckets = [];
+  for (let i = WEEKS - 1; i >= 0; i--) {
+    const start = new Date(now);
+    start.setDate(start.getDate() - i * 7 - start.getDay());
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 7);
+    buckets.push({ start, end, label: `${start.getMonth() + 1}/${start.getDate()}`, count: 0 });
+  }
+
+  const certificates = await Certificate.find({ issueDate: { $gte: buckets[0].start } });
+  certificates.forEach((c) => {
+    const b = buckets.find((bucket) => c.issueDate >= bucket.start && c.issueDate < bucket.end);
+    if (b) b.count += 1;
+  });
+
+  res.json({ trends: buckets.map((b) => ({ week: b.label, certificatesIssued: b.count })) });
+};
 // Cases where the inspector's declared reading disagreed with the OCR-extracted
 // reading from the evidence photo - these need a human to look at the photo.
 export const getReviewQueue = async (req, res) => {

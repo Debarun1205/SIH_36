@@ -1,5 +1,7 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import api from "../../api/axios.js";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 const issueTypes = [
   { value: "incorrect-weight", label: "Incorrect weight or measurement" },
@@ -10,7 +12,13 @@ const issueTypes = [
 ];
 
 export default function SubmitComplaint() {
-  const [form, setForm] = useState({ name: "", contact: "", issueType: "incorrect-weight", description: "" });
+  const { user } = useAuth();
+  const [form, setForm] = useState({
+    name: user?.role === "citizen" ? user.name : "",
+    contact: user?.role === "citizen" ? user.phone || "" : "",
+    issueType: "incorrect-weight",
+    description: "",
+  });
   const [submitted, setSubmitted] = useState(null);
   const [error, setError] = useState("");
 
@@ -36,6 +44,11 @@ export default function SubmitComplaint() {
             Reference ID: <span className="font-mono">{submitted._id}</span>
           </p>
           <p className="text-sm text-ink/60 mt-2">The relevant authority will review this report.</p>
+          {user?.role === "citizen" && (
+            <Link to="/citizen" className="text-brass text-sm hover:underline mt-3 inline-block">
+              Track it on your dashboard
+            </Link>
+          )}
         </div>
       </div>
     );

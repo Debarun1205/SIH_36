@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import api from "../../api/axios.js";
 import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const statusColor = { compliant: "#3F6B4A", "non-compliant": "#9B3B3B", pending: "#A6631E", unverified: "#8A8577" };
 
@@ -10,6 +11,7 @@ export default function AdminDashboard() {
 
   const tabs = [
     ["overview", "Overview"],
+    ["applications", "Applications"],
     ["map", "Map"],
     ["inspectors", "Inspectors"],
     ["tolerance", "Tolerance rules"],
@@ -37,6 +39,7 @@ export default function AdminDashboard() {
       </div>
 
       {tab === "overview" && <Overview />}
+      {tab === "applications" && <Applications />}
       {tab === "map" && <MapView />}
       {tab === "inspectors" && <Inspectors />}
       {tab === "tolerance" && <ToleranceRules />}
@@ -48,9 +51,11 @@ export default function AdminDashboard() {
 
 function Overview() {
   const [data, setData] = useState(null);
+  const [trends, setTrends] = useState([]);
 
   useEffect(() => {
     api.get("/inspections/analytics").then((res) => setData(res.data));
+    api.get("/inspections/trends").then((res) => setTrends(res.data.trends));
   }, []);
 
   if (!data) return <p className="text-ink/60">Loading…</p>;
@@ -73,6 +78,19 @@ function Overview() {
         ))}
       </div>
 
+      <h2 className="text-lg mb-3">Verification trends (last 8 weeks)</h2>
+      <div className="card mb-8" style={{ height: 220 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={trends}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#D8D2C4" />
+            <XAxis dataKey="week" tick={{ fontSize: 12 }} />
+            <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
+            <Tooltip />
+            <Line type="monotone" dataKey="certificatesIssued" stroke="#B8863B" strokeWidth={2} dot={{ r: 3 }} />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+
       <h2 className="text-lg mb-3">Flags for attention</h2>
       <div className="grid gap-2">
         {data.flags.map((f, idx) => (
@@ -88,6 +106,115 @@ function Overview() {
           </div>
         ))}
         {data.flags.length === 0 && <p className="text-ink/50 text-sm">No anomalies detected right now.</p>}
+      </div>
+    </div>
+  );
+}
+
+function Applications() {
+  const [applications, setApplications] = useState([]);
+  const [selected, setSelected] = useState(null);
+  const [suggestions, setSuggestions] = useState(null);
+  const [form, setForm] = useState({ inspectorId: "", date: "", startTime: "", endTime: "" });
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const load = () => api.get("/applications/pending").then((res) => setApplications(res.data.applications));
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  const openAssign = async (app) => {
+    setSelected(app);
+    setSuggestions(null);
+    setForm({ inspectorId: "", date: "", startTime: "09:00", endTime: "10:00" });
+    const { data } = await api.get(`/applications/${app._id}/suggest-inspectors`);
+    setSuggestions(data.ranked);
+  };
+
+  const assign = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError("");
+    try {
+      await api.post(`/applications/${selected._id}/assign`, form);
+      setSelected(null);
+      load();
+    } catch (err) {
+      setError(err.response?.data?.message || "Could not assign inspector");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="grid md:grid-cols-2 gap-6">
+      <div>
+        <h3 className="font-serif text-lg mb-3">Pending requests</h3>
+        <div className="grid gap-2">
+          {applications.map((a) => (
+            <div key={a._id} className="card !p-3 flex items-center justify-between">
+              <div>
+                <p className="font-medium text-sm">{a.shop?.shopName}</p>
+                <p className="text-xs text-ink/60">
+                  {a.shop?.city}, {a.shop?.state} · requested {new Date(a.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+              <button className="btn-brass !py-1.5" onClick={() => openAssign(a)}>
+                Assign
+              </button>
+            </div>
+          ))}
+          {applications.length === 0 && <p className="text-ink/50 text-center py-8">No pending requests.</p>}
+        </div>
+      </div>
+
+      <div>
+        <h3 className="font-serif text-lg mb-3">
+          {selected ? `Assign inspector — ${selected.shop?.shopName}` : "Select a request to assign"}
+        </h3>
+        {selected && (
+          <form onSubmit={assign} className="card space-y-3">
+            <p className="text-xs text-ink/60">Ranked by same city, then distance, then lowest current workload:</p>
+            <div className="max-h-48 overflow-y-auto space-y-1">
+              {suggestions === null && <p className="text-sm text-ink/50">Loading suggestions…</p>}
+              {suggestions?.map((s) => (
+                <label
+                  key={s.inspector.id}
+                  className={`flex items-center justify-between border rounded-sm px-3 py-2 text-sm cursor-pointer ${
+                    form.inspectorId === s.inspector.id ? "border-brass bg-paperdim/50" : "border-line"
+                  }`}
+                >
+                  <span>
+                    <input
+                      type="radio"
+                      name="inspector"
+                      className="mr-2"
+                      checked={form.inspectorId === s.inspector.id}
+                      onChange={() => setForm({ ...form, inspectorId: s.inspector.id })}
+                    />
+                    {s.inspector.name}{" "}
+                    <span className="text-ink/50">
+                      ({s.sameCity ? "same city" : s.distanceKm != null ? `${s.distanceKm.toFixed(1)} km` : "distance unknown"},{" "}
+                      {s.currentWorkload} upcoming)
+                    </span>
+                  </span>
+                </label>
+              ))}
+              {suggestions?.length === 0 && <p className="text-sm text-ink/50">No inspectors available yet.</p>}
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <input type="date" className="field-input" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} required />
+              <input type="time" className="field-input" value={form.startTime} onChange={(e) => setForm({ ...form, startTime: e.target.value })} required />
+              <input type="time" className="field-input" value={form.endTime} onChange={(e) => setForm({ ...form, endTime: e.target.value })} required />
+            </div>
+            {error && <p className="text-danger text-sm">{error}</p>}
+            <button className="btn-primary w-full" disabled={submitting || !form.inspectorId}>
+              {submitting ? "Assigning…" : "Confirm assignment"}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );

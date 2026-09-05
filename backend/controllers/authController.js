@@ -16,21 +16,23 @@ const sanitize = (user) => ({
 });
 
 // @route POST /api/auth/register
-// Public self-registration is only allowed for role "user" (shop owners/sellers).
-// Inspector accounts are created by an admin via /api/admin/inspectors.
+// Public self-registration is only allowed for role "user" (shop owners/sellers)
+// or "citizen" (consumers). Inspector and admin accounts are created by an
+// admin via /api/admin/inspectors - never through this open endpoint.
 export const register = async (req, res) => {
   try {
-    const { name, email, password, phone } = req.body;
+    const { name, email, password, phone, role } = req.body;
     if (!name || !email || !password) {
       return res.status(400).json({ message: "Name, email and password are required" });
     }
+    const safeRole = ["user", "citizen"].includes(role) ? role : "user";
 
     const existing = await User.findOne({ email: email.toLowerCase() });
     if (existing) {
       return res.status(409).json({ message: "An account with this email already exists" });
     }
 
-    const user = await User.create({ name, email, password, phone, role: "user" });
+    const user = await User.create({ name, email, password, phone, role: safeRole });
     const token = signToken(user);
     res.status(201).json({ token, user: sanitize(user) });
   } catch (err) {

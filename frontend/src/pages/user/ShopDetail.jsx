@@ -10,16 +10,19 @@ export default function ShopDetail() {
   const [certificates, setCertificates] = useState([]);
   const [slots, setSlots] = useState([]);
   const [tab, setTab] = useState("instruments");
+  const [applications, setApplications] = useState([]);
 
   const load = async () => {
-    const [shopRes, instrRes, certRes] = await Promise.all([
+    const [shopRes, instrRes, certRes, appRes] = await Promise.all([
       api.get(`/shops/${id}`),
       api.get(`/instruments/shop/${id}`),
       api.get(`/certificates/shop/${id}`),
+      api.get(`/applications/mine`),
     ]);
     setShop(shopRes.data.shop);
     setInstruments(instrRes.data.instruments);
     setCertificates(certRes.data.certificates);
+    setApplications(appRes.data.applications.filter((a) => a.shop?._id === id));
   };
 
   useEffect(() => {
@@ -53,7 +56,7 @@ export default function ShopDetail() {
       </div>
 
       <div className="flex gap-2 mb-6 border-b border-line">
-        {["instruments", "book", "certificates"].map((t) => (
+        {["instruments", "book", "apply", "certificates"].map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -61,13 +64,14 @@ export default function ShopDetail() {
               tab === t ? "border-brass text-inkdeep" : "border-transparent text-ink/50"
             }`}
           >
-            {t === "book" ? "Book inspection" : t}
+            {t === "book" ? "Book a slot myself" : t === "apply" ? "Request inspection" : t}
           </button>
         ))}
       </div>
 
       {tab === "instruments" && <InstrumentsTab shopId={id} instruments={instruments} onAdded={load} />}
       {tab === "book" && <BookTab shopId={id} slots={slots} onBooked={load} />}
+      {tab === "apply" && <ApplyTab shopId={id} applications={applications} onApplied={load} />}
       {tab === "certificates" && <CertificatesTab certificates={certificates} />}
     </div>
   );
@@ -217,6 +221,69 @@ function BookTab({ shopId, slots, onBooked }) {
           </div>
         ))}
         {slots.length === 0 && <p className="text-ink/50 text-center py-8">No open inspection slots nearby right now.</p>}
+      </div>
+    </div>
+  );
+}
+
+function ApplyTab({ shopId, applications, onApplied }) {
+  const [notes, setNotes] = useState("");
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const hasPending = applications.some((a) => a.status === "pending");
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError("");
+    try {
+      await api.post("/applications", { shopId, notes });
+      setNotes("");
+      onApplied();
+    } catch (err) {
+      setError(err.response?.data?.message || "Could not submit application");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div>
+      <p className="text-sm text-ink/60 mb-4">
+        Prefer not to pick a slot yourself? Request an inspection and the department will match you
+        with the nearest available inspector based on your location and their current workload.
+      </p>
+
+      {!hasPending && (
+        <form onSubmit={submit} className="card space-y-3 mb-6">
+          <label className="field-label">Notes for the inspector (optional)</label>
+          <textarea className="field-input" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
+          {error && <p className="text-danger text-sm">{error}</p>}
+          <button className="btn-primary" disabled={submitting}>
+            {submitting ? "Submitting…" : "Request inspection"}
+          </button>
+        </form>
+      )}
+
+      <div className="grid gap-3">
+        {applications.map((a) => (
+          <div key={a._id} className="card flex items-center justify-between">
+            <div>
+              <p className="text-sm text-ink/60">Requested {new Date(a.createdAt).toLocaleDateString()}</p>
+              {a.notes && <p className="text-sm">{a.notes}</p>}
+              {a.assignedInspection && (
+                <p className="text-sm text-ok mt-1">
+                  Assigned to {a.assignedInspection.inspector?.name} ·{" "}
+                  {a.assignedInspection.slot && new Date(a.assignedInspection.slot.date).toLocaleDateString()}{" "}
+                  {a.assignedInspection.slot?.startTime}
+                </p>
+              )}
+            </div>
+            <span className={a.status === "assigned" ? "seal-compliant" : "seal-pending"}>{a.status}</span>
+          </div>
+        ))}
+        {applications.length === 0 && <p className="text-ink/50 text-center py-8">No inspection requests yet.</p>}
       </div>
     </div>
   );
