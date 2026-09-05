@@ -11,7 +11,6 @@
 [![Node](https://img.shields.io/badge/node-20.x-339933?logo=node.js&logoColor=white)](#tech-stack)
 [![NestJS](https://img.shields.io/badge/backend-NestJS-E0234E?logo=nestjs&logoColor=white)](#tech-stack)
 [![MongoDB](https://img.shields.io/badge/database-MongoDB-47A248?logo=mongodb&logoColor=white)](#tech-stack)
-[![Docker](https://img.shields.io/badge/containerized-Docker-2496ED?logo=docker&logoColor=white)](#deployment)
 
 
 A digital lifecycle platform for legal-metrology verification: businesses register
