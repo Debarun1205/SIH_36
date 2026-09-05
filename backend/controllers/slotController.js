@@ -1,4 +1,5 @@
 import InspectionSlot from "../models/InspectionSlot.js";
+import User from "../models/User.js";
 import { haversineDistance } from "../utils/distance.js";
 
 // @route POST /api/slots  (role: inspector)
@@ -37,7 +38,12 @@ export const getMySlots = async (req, res) => {
 // location-aware matching so shop owners get inspectors close to them).
 export const getAvailableSlots = async (req, res) => {
   const { city, state, lat, lng } = req.query;
-  const filter = { isBooked: false, date: { $gte: new Date(new Date().toDateString()) } };
+  const approvedInspectorIds = await User.find({ role: "inspector", approvalStatus: "approved" }).select("_id");
+  const filter = {
+    isBooked: false,
+    date: { $gte: new Date(new Date().toDateString()) },
+    inspector: { $in: approvedInspectorIds.map((i) => i._id) },
+  };
   if (city) filter.city = city;
   if (state) filter.state = state;
 

@@ -15,6 +15,7 @@ import adminRoutes from "./routes/adminRoutes.js";
 import toleranceRoutes from "./routes/toleranceRoutes.js";
 import complaintRoutes from "./routes/complaintRoutes.js";
 import applicationRoutes from "./routes/applicationRoutes.js";
+import productRoutes from "./routes/productRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -41,6 +42,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/tolerance-rules", toleranceRoutes);
 app.use("/api/complaints", complaintRoutes);
 app.use("/api/applications", applicationRoutes);
+app.use("/api/products", productRoutes);
 
 // 404 handler
 app.use((req, res) => res.status(404).json({ message: "Route not found" }));

@@ -11,6 +11,7 @@ export default function AdminDashboard() {
 
   const tabs = [
     ["overview", "Overview"],
+    ["approvals", "Inspector Approvals"],
     ["applications", "Applications"],
     ["map", "Map"],
     ["inspectors", "Inspectors"],
@@ -39,6 +40,7 @@ export default function AdminDashboard() {
       </div>
 
       {tab === "overview" && <Overview />}
+      {tab === "approvals" && <InspectorApprovals />}
       {tab === "applications" && <Applications />}
       {tab === "map" && <MapView />}
       {tab === "inspectors" && <Inspectors />}
@@ -106,6 +108,59 @@ function Overview() {
           </div>
         ))}
         {data.flags.length === 0 && <p className="text-ink/50 text-sm">No anomalies detected right now.</p>}
+      </div>
+    </div>
+  );
+}
+
+function InspectorApprovals() {
+  const [pending, setPending] = useState([]);
+  const [error, setError] = useState("");
+
+  const load = () => api.get("/admin/inspectors/pending").then((res) => setPending(res.data.inspectors));
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  const decide = async (id, action) => {
+    setError("");
+    try {
+      await api.patch(`/admin/inspectors/${id}/${action}`);
+      load();
+    } catch (err) {
+      setError(err.response?.data?.message || "Could not update this inspector");
+    }
+  };
+
+  return (
+    <div>
+      <p className="text-sm text-ink/60 mb-4">
+        Inspectors who self-registered are listed here with the location and availability they
+        submitted. They can't access the inspector dashboard until you approve them.
+      </p>
+      {error && <p className="text-danger text-sm mb-3">{error}</p>}
+      <div className="grid gap-3">
+        {pending.map((i) => (
+          <div key={i._id} className="card flex items-center justify-between">
+            <div>
+              <p className="font-medium">{i.name}</p>
+              <p className="text-sm text-ink/60">{i.email} · {i.phone}</p>
+              <p className="text-xs text-ink/50 mt-1">
+                Base location: {i.baseLocation?.city}, {i.baseLocation?.state}
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <button className="btn-outline !py-1.5" onClick={() => decide(i._id, "reject")}>
+                Reject
+              </button>
+              <button className="btn-brass !py-1.5" onClick={() => decide(i._id, "approve")}>
+                Approve
+              </button>
+            </div>
+          </div>
+        ))}
+        {pending.length === 0 && <p className="text-ink/50 text-center py-8">No pending inspector registrations.</p>}
       </div>
     </div>
   );

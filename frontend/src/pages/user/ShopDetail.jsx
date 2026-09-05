@@ -56,7 +56,7 @@ export default function ShopDetail() {
       </div>
 
       <div className="flex gap-2 mb-6 border-b border-line">
-        {["instruments", "book", "apply", "certificates"].map((t) => (
+        {["instruments", "products", "book", "apply", "certificates"].map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -64,12 +64,13 @@ export default function ShopDetail() {
               tab === t ? "border-brass text-inkdeep" : "border-transparent text-ink/50"
             }`}
           >
-            {t === "book" ? "Book a slot myself" : t === "apply" ? "Request inspection" : t}
+            {t === "book" ? "Book a slot myself" : t === "apply" ? "Request inspection" : t === "products" ? "Items sold" : t}
           </button>
         ))}
       </div>
 
       {tab === "instruments" && <InstrumentsTab shopId={id} instruments={instruments} onAdded={load} />}
+      {tab === "products" && <ProductsTab shopId={id} />}
       {tab === "book" && <BookTab shopId={id} slots={slots} onBooked={load} />}
       {tab === "apply" && <ApplyTab shopId={id} applications={applications} onApplied={load} />}
       {tab === "certificates" && <CertificatesTab certificates={certificates} />}
@@ -174,6 +175,95 @@ function InstrumentsTab({ shopId, instruments, onAdded }) {
             <tr>
               <td colSpan={4} className="text-ink/50 py-6 text-center">
                 No instruments registered yet.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function ProductsTab({ shopId }) {
+  const [products, setProducts] = useState([]);
+  const [form, setForm] = useState({ name: "", category: "", price: "", unit: "", description: "" });
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const load = () => api.get(`/products/shop/${shopId}`).then((res) => setProducts(res.data.products));
+
+  useEffect(() => {
+    load();
+  }, [shopId]);
+
+  const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError("");
+    try {
+      await api.post("/products", { shopId, ...form, price: form.price ? parseFloat(form.price) : undefined });
+      setForm({ name: "", category: "", price: "", unit: "", description: "" });
+      load();
+    } catch (err) {
+      setError(err.response?.data?.message || "Could not add item");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const remove = async (id) => {
+    await api.delete(`/products/${id}`);
+    load();
+  };
+
+  return (
+    <div>
+      <p className="text-sm text-ink/60 mb-4">
+        Items you list here are visible to citizens browsing nearby shops and on your public QR page.
+      </p>
+
+      <form onSubmit={submit} className="card space-y-3 mb-6">
+        <div className="grid grid-cols-2 gap-3">
+          <input className="field-input" placeholder="Item name" value={form.name} onChange={set("name")} required />
+          <input className="field-input" placeholder="Category (optional)" value={form.category} onChange={set("category")} />
+          <input className="field-input" placeholder="Price (optional)" type="number" step="any" value={form.price} onChange={set("price")} />
+          <input className="field-input" placeholder="Unit (e.g. per kg)" value={form.unit} onChange={set("unit")} />
+        </div>
+        <input className="field-input" placeholder="Description (optional)" value={form.description} onChange={set("description")} />
+        {error && <p className="text-danger text-sm">{error}</p>}
+        <button className="btn-brass" disabled={submitting}>
+          {submitting ? "Adding…" : "+ Add item"}
+        </button>
+      </form>
+
+      <table className="ledger-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {products.map((p) => (
+            <tr key={p._id}>
+              <td>{p.name}</td>
+              <td>{p.category || "—"}</td>
+              <td>{p.price != null ? `₹${p.price} ${p.unit || ""}` : "—"}</td>
+              <td>
+                <button onClick={() => remove(p._id)} className="text-danger text-xs hover:underline">
+                  Remove
+                </button>
+              </td>
+            </tr>
+          ))}
+          {products.length === 0 && (
+            <tr>
+              <td colSpan={4} className="text-ink/50 py-6 text-center">
+                No items listed yet.
               </td>
             </tr>
           )}

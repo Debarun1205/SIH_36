@@ -45,33 +45,53 @@ SIH_36/
 └── frontend/    React + Vite + Tailwind CSS
 ```
 
-**Roles:** `user` (shop/business owner), `citizen` (consumer), `inspector`, `admin`
-(government/department staff). JWT-based auth with role-based access control on
-every protected route. `user` and `citizen` are open self-signup; `inspector`
-and `admin` accounts can only be created by an existing admin.
+**Roles:** `user` (shop/business owner), `citizen` (consumer), `inspector`,
+`admin` (government official). JWT-based auth with role-based access control
+on every protected route.
 
-**Two ways a shop gets inspected:**
+**Registration is split into two separate flows:**
+- `/register` — open to **business owners** and **citizens**. Anyone can sign
+  up as either.
+- `/register-official` — for **inspectors** and **government officials**,
+  kept deliberately separate from the public flow:
+  - **Government/admin** registration is hard-restricted to one email address
+    (`debarunbanerjee1205@gmail.com`, set in `authController.js`) — anyone
+    else requesting the admin role is rejected outright.
+  - **Inspector** registration is open, but requires the inspector's base
+    location and at least one initial availability time slot up front, and
+    the account starts in a `pending` approval state. A pending inspector can
+    log in, but sees an "approval pending" screen instead of the dashboard
+    until a government admin approves them from the **Inspector Approvals**
+    tab. Only shop registration remains locked to the `user` role alone —
+    citizens never see a "register a shop" option anywhere in the UI.
+
+**Three ways a shop gets inspected**, all feeding the same `Inspection` model:
 1. **Self-service booking** — shop owner browses open inspector time slots
-   (nearest-first if they share their location) and books one directly.
-2. **Hand-down / assignment** — shop owner just "requests" an inspection with
-   no slot picked (`Application` model). An admin sees the queue, gets a
-   ranked shortlist of inspectors (same city first, then distance, then
-   lowest current workload), picks one, and assigns a date/time in one step —
-   this is the government-staff-driven assignment path from the PRD (FR-05).
+   and books one directly.
+2. **Hand-down / assignment** — shop owner requests an inspection with no
+   slot picked; an admin sees the queue, gets a ranked shortlist of
+   inspectors (same city → distance → lowest workload), and assigns one.
+3. **Inspector self-serve** — an approved inspector browses shops that still
+   need verification (nearest-first, from their own registered base
+   location) and picks one to inspect using one of their own open slots.
 
-**Core flow:** user registers a shop → adds instruments (with optional nameplate OCR)
-→ either books a slot themselves or requests an inspection for admin hand-down →
-inspector conducts the inspection, entering measurements and photographing the display
-→ system cross-checks OCR vs. declared reading → compliant results auto-issue a
-tamper-evident certificate with QR → citizens (with or without an account) scan
-the QR to verify instantly, and can optionally create a citizen account to track
-the status of complaints they've filed.
+**What citizens can do:** browse nearby shops (sorted by distance if they
+share their location) with each shop's compliance status and the items it
+sells, without needing an account; scan a QR or paste an ID to verify any
+shop/instrument/certificate instantly; optionally create a citizen account to
+track the status of complaints they've filed over time.
+
+**What shop owners can do:** register their shop (and only their shop — this
+is enforced at both the API route and the frontend route level), add
+instruments with optional nameplate OCR, **list the items they sell** (shown
+to citizens browsing nearby and on the shop's public QR page), and choose
+between booking a slot themselves or requesting hand-down assignment.
 
 **Government dashboard** (the `admin` role) covers: live compliance summary,
-an 8-week verification-trends chart, the assignment queue above, a GIS
-compliance map (Leaflet/OSM), inspector account management, configurable
-per-instrument tolerance rules, the OCR-conflict review queue, and citizen
-complaint triage.
+an 8-week verification-trends chart, inspector approval queue, the
+hand-down assignment queue, a GIS compliance map (Leaflet/OSM), inspector
+account management, configurable per-instrument tolerance rules, the
+OCR-conflict review queue, and citizen complaint triage.
 
 ## Local setup
 

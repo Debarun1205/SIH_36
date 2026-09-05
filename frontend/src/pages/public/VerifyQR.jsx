@@ -126,6 +126,25 @@ export default function VerifyQR() {
               <div className="mt-4 text-sm">
                 <p className="text-ink/60 mb-1">Instruments on record: {result.instruments.length}</p>
               </div>
+              {result.products?.length > 0 && (
+                <div className="mt-4 border-t border-line pt-4">
+                  <p className="text-ink/60 text-sm mb-2">Items sold here:</p>
+                  <ul className="text-sm space-y-1">
+                    {result.products.map((p) => (
+                      <li key={p._id} className="flex justify-between">
+                        <span>
+                          {p.name} {p.category && <span className="text-ink/40">({p.category})</span>}
+                        </span>
+                        {p.price != null && (
+                          <span className="text-ink/60">
+                            ₹{p.price} {p.unit}
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </>
           )}
 

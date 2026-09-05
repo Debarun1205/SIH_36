@@ -6,6 +6,7 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import Home from "./pages/Home.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
+import RegisterOfficial from "./pages/RegisterOfficial.jsx";
 
 import VerifyQR from "./pages/public/VerifyQR.jsx";
 import SubmitComplaint from "./pages/public/SubmitComplaint.jsx";
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/register-official" element={<RegisterOfficial />} />
           <Route path="/verify" element={<VerifyQR />} />
           <Route path="/verify/:type/:id" element={<VerifyQR />} />
           <Route path="/complaint" element={<SubmitComplaint />} />

@@ -1,6 +1,7 @@
 import Shop from "../models/Shop.js";
 import Instrument from "../models/Instrument.js";
 import Certificate from "../models/Certificate.js";
+import Product from "../models/Product.js";
 import { verifyCertificateIntegrity } from "../utils/integrity.js";
 
 // @route GET /api/verify/:type/:id   (public, no auth - this is what scanning a QR hits)
@@ -13,12 +14,14 @@ export const verifyByQr = async (req, res) => {
       if (!shop) return res.status(404).json({ message: "Shop not found" });
 
       const instruments = await Instrument.find({ shop: shop._id });
+      const products = await Product.find({ shop: shop._id }).sort({ category: 1, name: 1 });
       const activeCert = await Certificate.findOne({ shop: shop._id, status: "active" }).sort({ validUntil: -1 });
 
       return res.json({
         type: "shop",
         shop,
         instruments,
+        products,
         certificate: activeCert
           ? {
               certificateId: activeCert.certificateId,

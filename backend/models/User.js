@@ -12,6 +12,14 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "citizen", "inspector", "admin"],
       default: "user",
     },
+    // Only meaningful for self-registered inspectors: they can log in
+    // immediately, but the inspector dashboard stays gated until a govt
+    // admin approves them. Every other role defaults to "approved".
+    approvalStatus: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "approved",
+    },
     // Only relevant for inspectors: the base city/state they operate from
     baseLocation: {
       city: String,

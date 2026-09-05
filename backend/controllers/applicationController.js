@@ -61,7 +61,7 @@ export const suggestInspectors = async (req, res) => {
   if (!application) return res.status(404).json({ message: "Application not found" });
   const shop = application.shop;
 
-  const inspectors = await User.find({ role: "inspector", isActive: true });
+  const inspectors = await User.find({ role: "inspector", isActive: true, approvalStatus: "approved" });
 
   const workloadByInspector = {};
   const upcoming = await Inspection.find({ status: "scheduled" });

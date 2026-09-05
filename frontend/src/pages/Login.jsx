@@ -47,7 +47,12 @@ export default function Login() {
         <Link to="/register" className="text-brass hover:underline">
           Register here
         </Link>
-        . Inspector and admin accounts are created by the department.
+      </p>
+      <p className="text-sm text-ink/60 mt-1">
+        Government official or inspector?{" "}
+        <Link to="/register-official" className="text-brass hover:underline">
+          Register here
+        </Link>
       </p>
     </div>
   );

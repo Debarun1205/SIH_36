@@ -199,6 +199,41 @@ export const getVerificationTrends = async (req, res) => {
 };
 // Cases where the inspector's declared reading disagreed with the OCR-extracted
 // reading from the evidence photo - these need a human to look at the photo.
+// @route POST /api/inspections/self-assign  (role: inspector)
+// The self-serve counterpart to bookInspection: the inspector picks a shop
+// that needs inspection and one of their OWN open slots, instead of a shop
+// owner booking them or an admin handing the task down.
+export const selfAssignInspection = async (req, res) => {
+  try {
+    const { shopId, slotId } = req.body;
+
+    const shop = await Shop.findById(shopId);
+    if (!shop) return res.status(404).json({ message: "Shop not found" });
+
+    const slot = await InspectionSlot.findById(slotId);
+    if (!slot) return res.status(404).json({ message: "Slot not found" });
+    if (slot.inspector.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "This is not one of your own slots" });
+    }
+    if (slot.isBooked) {
+      return res.status(409).json({ message: "This slot is already booked" });
+    }
+
+    slot.isBooked = true;
+    slot.shop = shopId;
+    await slot.save();
+
+    const inspection = await Inspection.create({ shop: shopId, inspector: req.user._id, slot: slot._id });
+
+    shop.complianceStatus = "pending";
+    await shop.save();
+
+    res.status(201).json({ inspection });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 export const getReviewQueue = async (req, res) => {
   const inspections = await Inspection.find({ result: "review-required" })
     .populate("shop", "shopName city state")

@@ -6,12 +6,14 @@ import {
   getAnalytics,
   getReviewQueue,
   getVerificationTrends,
+  selfAssignInspection,
 } from "../controllers/inspectionController.js";
 import { protect, authorize } from "../middleware/auth.js";
 
 const router = express.Router();
 
 router.post("/book", protect, authorize("user"), bookInspection);
+router.post("/self-assign", protect, authorize("inspector"), selfAssignInspection);
 router.get("/mine", protect, authorize("user", "inspector"), getMyInspections);
 router.patch("/:id/complete", protect, authorize("inspector"), completeInspection);
 router.get("/analytics", protect, authorize("admin"), getAnalytics);
