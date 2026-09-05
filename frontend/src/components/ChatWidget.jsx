@@ -44,7 +44,7 @@ export default function ChatWidget() {
         <div className="w-80 h-96 bg-white border border-line rounded-sm shadow-lg flex flex-col mb-3">
           <div className="bg-ink text-paper px-4 py-3 flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium">MaanVerify Assistant</p>
+              <p className="text-sm font-medium">MaanDrishti Assistant</p>
               <p className="text-xs text-paper/60 capitalize">{roleLabel[user.role]} view</p>
             </div>
             <button onClick={() => setOpen(false)} className="text-paper/70 hover:text-paper text-lg leading-none">

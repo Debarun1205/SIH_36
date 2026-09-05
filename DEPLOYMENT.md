@@ -15,7 +15,7 @@ After you extract/download this project folder onto your machine:
 cd path/to/SIH_36          # cd into the extracted project folder
 git init
 git add .
-git commit -m "Initial commit: MaanVerify prototype (backend + frontend)"
+git commit -m "Initial commit: MaanDrishti prototype (backend + frontend)"
 git branch -M main
 git remote add origin https://github.com/Debarun1205/SIH_36.git
 git push -u origin main

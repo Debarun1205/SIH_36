@@ -15,7 +15,7 @@ export default function Navbar() {
           <span className="w-8 h-8 rounded-full border-2 border-brass flex items-center justify-center text-brass font-serif font-semibold text-sm">
             MV
           </span>
-          <span className="font-serif text-lg text-inkdeep">MaanVerify</span>
+          <span className="font-serif text-lg text-inkdeep">MaanDrishti</span>
         </Link>
 
         <nav className="flex items-center gap-4 text-sm">

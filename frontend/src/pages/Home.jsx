@@ -9,7 +9,7 @@ export default function Home() {
         Every weighing and measuring instrument, verifiably compliant.
       </h1>
       <p className="text-ink/70 max-w-xl mx-auto mb-8">
-        MaanVerify gives businesses, inspectors and citizens one place to register instruments,
+        MaanDrishti gives businesses, inspectors and citizens one place to register instruments,
         schedule inspections, issue tamper-evident digital certificates, and check compliance
         status instantly by scanning a QR code.
       </p>

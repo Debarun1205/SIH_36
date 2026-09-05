@@ -99,7 +99,7 @@ export default function App() {
         </Routes>
       </main>
       <footer className="border-t border-line py-6 text-center text-xs text-ink/40">
-        MaanVerify — SIH prototype for online verification of weighing &amp; measuring instruments
+        MaanDrishti — SIH prototype for online verification of weighing &amp; measuring instruments
       </footer>
       <ChatWidget />
     </div>
