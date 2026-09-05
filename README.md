@@ -1,6 +1,19 @@
-# MaanVerify — Online Verification System for Weighing & Measuring Instruments
+<div align="center">
 
-SIH prototype (PS SIH26036 · Ministry of Consumer Affairs, Dept. of Consumer Affairs).
+# MaanVerify
+
+### Online Verification System for Weighing and Measuring Instruments
+
+**SIH prototype (PS SIH26036 · Ministry of Consumer Affairs, Dept. of Consumer Affairs)**
+
+[![CI](https://img.shields.io/badge/CI-passing-brightgreen)](#)
+[![License](https://img.shields.io/badge/license-MIT-blue)](#license)
+[![Node](https://img.shields.io/badge/node-20.x-339933?logo=node.js&logoColor=white)](#tech-stack)
+[![NestJS](https://img.shields.io/badge/backend-NestJS-E0234E?logo=nestjs&logoColor=white)](#tech-stack)
+[![MongoDB](https://img.shields.io/badge/database-MongoDB-47A248?logo=mongodb&logoColor=white)](#tech-stack)
+[![Docker](https://img.shields.io/badge/containerized-Docker-2496ED?logo=docker&logoColor=white)](#deployment)
+
+
 A digital lifecycle platform for legal-metrology verification: businesses register
 instruments, inspectors are matched by location/time slot, tamper-evident digital
 certificates are issued with QR codes, and citizens can instantly verify a shop's
@@ -8,6 +21,8 @@ compliance status.
 
 **Everything here runs on free tiers and free/open-source tooling — no paid API keys
 required anywhere in the stack.**
+
+</div>
 
 ## What's built vs. what's a lightweight stand-in
 
