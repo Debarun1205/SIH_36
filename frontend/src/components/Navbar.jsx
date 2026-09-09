@@ -24,7 +24,7 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur">
-      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 min-h-16 flex flex-wrap items-center justify-between gap-y-2 py-2">
         <Link to={user ? roleHome[user.role] : "/"} className="flex items-center gap-2.5">
          <img
             src="/logo.png"
@@ -34,7 +34,7 @@ export default function Navbar() {
           <span className="font-serif text-lg text-inkdeep">MaanDrishti</span>
         </Link>
 
-        <nav className="flex items-center gap-5 text-sm">
+        <nav className="flex items-center gap-3 sm:gap-5 text-xs sm:text-sm flex-wrap justify-end">
           {navLink("/verify", "Verify an instrument")}
           {navLink("/complaint", "Report an issue")}
           {user ? (
