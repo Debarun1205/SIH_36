@@ -11,7 +11,7 @@ export default function GovStrip() {
             Ministry of Consumer Affairs, Food &amp; Public Distribution · Department of Consumer Affairs
           </span>
         </div>
-        <span className="gov-pill">Prototype · Not a live government system</span>
+        <span className="gov-pill">SIH Prototype · Not a live government system</span>
       </div>
     </div>
   );
