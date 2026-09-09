@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
+import { ShieldCheckIcon } from "../components/Icons.jsx";
 
 const roleHome = { user: "/user", citizen: "/citizen", inspector: "/inspector", admin: "/admin" };
 
@@ -18,10 +19,13 @@ export default function Login() {
 
   return (
     <div className="max-w-md mx-auto mt-16 px-6">
+      <span className="page-icon-badge mb-3">
+        <ShieldCheckIcon className="w-5 h-5" />
+      </span>
       <h1 className="text-2xl mb-1">Log in</h1>
       <p className="text-ink/60 text-sm mb-6">Access your business, inspector, or admin dashboard.</p>
 
-      <form onSubmit={submit} className="card space-y-4">
+      <form onSubmit={submit} className="card-official space-y-4">
         <div>
           <label className="field-label">Email</label>
           <input className="field-input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
+import { InspectorIcon, GovIcon } from "../components/Icons.jsx";
 
 export default function RegisterOfficial() {
   const { register, loading, error } = useAuth();
@@ -93,26 +94,28 @@ export default function RegisterOfficial() {
         <button
           type="button"
           onClick={() => setRole("inspector")}
-          className={`flex-1 py-2 text-sm rounded-sm border ${
-            role === "inspector" ? "bg-ink text-paper border-ink" : "border-line text-ink/60"
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm rounded-md border transition-colors ${
+            role === "inspector" ? "bg-ink text-paper border-ink shadow-soft" : "border-line text-ink/60 hover:border-ink/30"
           }`}
         >
+          <InspectorIcon className="w-4 h-4" />
           Inspector
         </button>
         <button
           type="button"
           onClick={() => setRole("admin")}
-          className={`flex-1 py-2 text-sm rounded-sm border ${
-            role === "admin" ? "bg-ink text-paper border-ink" : "border-line text-ink/60"
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm rounded-md border transition-colors ${
+            role === "admin" ? "bg-ink text-paper border-ink shadow-soft" : "border-line text-ink/60 hover:border-ink/30"
           }`}
         >
+          <GovIcon className="w-4 h-4" />
           Government Official
         </button>
       </div>
 
-      <form onSubmit={submit} className="card space-y-4">
+      <form onSubmit={submit} className="card-official space-y-4">
         {role === "admin" && (
-          <p className="text-xs text-warn bg-[#FBF3E6] border border-warn/30 rounded-sm px-3 py-2">
+          <p className="text-xs text-warn bg-[#FBF3E6] border border-warn/30 rounded-md px-3 py-2">
             Government registration is restricted to one authorized departmental email. Anyone else
             submitting this form will be rejected.
           </p>
@@ -201,7 +204,7 @@ export default function RegisterOfficial() {
               </p>
               <input type="file" accept="image/*,.pdf" onChange={handleIdUpload} className="text-sm" required />
               {govtIdPreview && govtIdPreview.startsWith("data:image") && (
-                <img src={govtIdPreview} alt="ID preview" className="w-32 h-32 object-cover rounded-sm border border-line mt-2" />
+                <img src={govtIdPreview} alt="ID preview" className="w-32 h-32 object-cover rounded-md border border-line mt-2" />
               )}
               {govtIdPreview && !govtIdPreview.startsWith("data:image") && (
                 <p className="text-xs text-ok mt-2">File attached.</p>

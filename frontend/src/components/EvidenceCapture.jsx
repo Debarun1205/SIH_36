@@ -90,7 +90,7 @@ export default function EvidenceCapture({ label = "Upload evidence photo", onCap
   };
 
   return (
-    <div className="border border-line rounded-sm p-4 bg-paperdim/40">
+    <div className="border border-line rounded-md p-4 bg-paperdim/40">
       <label className="field-label">{label}</label>
       <input
         type="file"
@@ -102,7 +102,7 @@ export default function EvidenceCapture({ label = "Upload evidence photo", onCap
 
       {preview && (
         <div className="mt-3 flex gap-4 items-start">
-          <img src={preview} alt="evidence" className="w-32 h-32 object-cover rounded-sm border border-line" />
+          <img src={preview} alt="evidence" className="w-32 h-32 object-cover rounded-md border border-line" />
           <div className="text-sm space-y-1">
             {status === "reading" && <p className="text-ink/60">Reading the photo…</p>}
             {status === "done" && (
@@ -119,7 +119,7 @@ export default function EvidenceCapture({ label = "Upload evidence photo", onCap
                   {showRaw ? "Hide technical details" : "Show technical details"}
                 </button>
                 {showRaw && (
-                  <p className="text-xs font-mono text-ink/50 bg-white rounded-sm p-2 border border-line">
+                  <p className="text-xs font-mono text-ink/50 bg-white rounded-md p-2 border border-line">
                     Raw OCR text: {ocrText || "(none detected)"}
                   </p>
                 )}

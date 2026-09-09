@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 
 const roleHome = { user: "/user", citizen: "/citizen", inspector: "/inspector", admin: "/admin" };
@@ -7,27 +7,37 @@ const roleHome = { user: "/user", citizen: "/citizen", inspector: "/inspector", 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const navLink = (to, label) => (
+    <Link
+      to={to}
+      className={`relative py-1 text-ink/70 hover:text-ink transition-colors ${
+        location.pathname === to
+          ? "text-ink font-medium after:absolute after:-bottom-1 after:left-0 after:right-0 after:h-0.5 after:bg-brass after:rounded-full"
+          : ""
+      }`}
+    >
+      {label}
+    </Link>
+  );
 
   return (
-    <header className="border-b border-line bg-white">
+    <header className="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link to={user ? roleHome[user.role] : "/"} className="flex items-center gap-2">
-          <span className="w-8 h-8 rounded-full border-2 border-brass flex items-center justify-center text-brass font-serif font-semibold text-sm">
-            MV
+        <Link to={user ? roleHome[user.role] : "/"} className="flex items-center gap-2.5">
+          <span className="w-9 h-9 rounded-full bg-ink text-paper flex items-center justify-center font-serif font-semibold text-sm shadow-sm ring-2 ring-brass/40">
+            MD
           </span>
-          <span className="font-serif text-lg text-inkdeep">MaanVerify</span>
+          <span className="font-serif text-lg text-inkdeep">MaanDrishti</span>
         </Link>
 
-        <nav className="flex items-center gap-4 text-sm">
-          <Link to="/verify" className="text-ink/70 hover:text-ink">
-            Verify an instrument
-          </Link>
-          <Link to="/complaint" className="text-ink/70 hover:text-ink">
-            Report an issue
-          </Link>
+        <nav className="flex items-center gap-5 text-sm">
+          {navLink("/verify", "Verify an instrument")}
+          {navLink("/complaint", "Report an issue")}
           {user ? (
             <>
-              <span className="text-ink/50">|</span>
+              <span className="text-line">|</span>
               <span className="text-ink/70">
                 {user.name} <span className="text-ink/40">({user.role})</span>
               </span>

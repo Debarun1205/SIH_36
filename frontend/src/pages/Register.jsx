@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
+import { ShopIcon, CitizenIcon } from "../components/Icons.jsx";
 
 export default function Register() {
   const { register, loading, error } = useAuth();
@@ -26,24 +27,26 @@ export default function Register() {
         <button
           type="button"
           onClick={() => setForm({ ...form, role: "user" })}
-          className={`flex-1 py-2 text-sm rounded-sm border ${
-            form.role === "user" ? "bg-ink text-paper border-ink" : "border-line text-ink/60"
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm rounded-md border transition-colors ${
+            form.role === "user" ? "bg-ink text-paper border-ink shadow-soft" : "border-line text-ink/60 hover:border-ink/30"
           }`}
         >
+          <ShopIcon className="w-4 h-4" />
           Business / Shop Owner
         </button>
         <button
           type="button"
           onClick={() => setForm({ ...form, role: "citizen" })}
-          className={`flex-1 py-2 text-sm rounded-sm border ${
-            form.role === "citizen" ? "bg-ink text-paper border-ink" : "border-line text-ink/60"
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm rounded-md border transition-colors ${
+            form.role === "citizen" ? "bg-ink text-paper border-ink shadow-soft" : "border-line text-ink/60 hover:border-ink/30"
           }`}
         >
+          <CitizenIcon className="w-4 h-4" />
           Citizen / Consumer
         </button>
       </div>
 
-      <form onSubmit={submit} className="card space-y-4">
+      <form onSubmit={submit} className="card-official space-y-4">
         <div>
           <label className="field-label">Full name</label>
           <input className="field-input" value={form.name} onChange={set("name")} required />

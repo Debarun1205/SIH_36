@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../../api/axios.js";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { FlagIcon, ShieldCheckIcon } from "../../components/Icons.jsx";
 
 const issueTypes = [
   { value: "incorrect-weight", label: "Incorrect weight or measurement" },
@@ -50,6 +51,9 @@ export default function SubmitComplaint() {
     return (
       <div className="max-w-md mx-auto mt-16 px-6 text-center">
         <div className="card">
+          <span className="page-icon-badge mx-auto mb-3">
+            <ShieldCheckIcon className="w-5 h-5" />
+          </span>
           <h2 className="text-xl mb-2">Report received</h2>
           <p className="text-sm text-ink/70">
             Reference ID: <span className="font-mono">{submitted._id}</span>
@@ -68,6 +72,9 @@ export default function SubmitComplaint() {
 
   return (
     <div className="max-w-md mx-auto mt-16 px-6">
+      <span className="page-icon-badge mb-3">
+        <FlagIcon className="w-5 h-5" />
+      </span>
       <h1 className="text-2xl mb-1">Report an issue</h1>
       <p className="text-ink/60 text-sm mb-6">No account needed. Tell us what you noticed.</p>
 
@@ -75,8 +82,8 @@ export default function SubmitComplaint() {
         <button
           type="button"
           onClick={() => setTab("submit")}
-          className={`flex-1 py-2 text-sm rounded-sm border ${
-            tab === "submit" ? "bg-ink text-paper border-ink" : "border-line text-ink/60"
+          className={`flex-1 py-2.5 text-sm rounded-md border transition-colors ${
+            tab === "submit" ? "bg-ink text-paper border-ink shadow-soft" : "border-line text-ink/60 hover:border-ink/30"
           }`}
         >
           Submit a report
@@ -84,8 +91,8 @@ export default function SubmitComplaint() {
         <button
           type="button"
           onClick={() => setTab("track")}
-          className={`flex-1 py-2 text-sm rounded-sm border ${
-            tab === "track" ? "bg-ink text-paper border-ink" : "border-line text-ink/60"
+          className={`flex-1 py-2.5 text-sm rounded-md border transition-colors ${
+            tab === "track" ? "bg-ink text-paper border-ink shadow-soft" : "border-line text-ink/60 hover:border-ink/30"
           }`}
         >
           Track a report
@@ -93,7 +100,7 @@ export default function SubmitComplaint() {
       </div>
 
       {tab === "submit" ? (
-        <form onSubmit={submit} className="card space-y-4">
+        <form onSubmit={submit} className="card-official space-y-4">
           <div>
             <label className="field-label">Your name (optional)</label>
             <input className="field-input" value={form.name} onChange={set("name")} />

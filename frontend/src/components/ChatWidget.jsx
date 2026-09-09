@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import api from "../api/axios.js";
 import { useAuth } from "../context/AuthContext.jsx";
+import { ChatIcon } from "./Icons.jsx";
 
 const roleLabel = { user: "business", citizen: "citizen", inspector: "inspector", admin: "government" };
 
@@ -41,10 +42,10 @@ export default function ChatWidget() {
   return (
     <div className="fixed bottom-5 right-5 z-50">
       {open && (
-        <div className="w-80 h-96 bg-white border border-line rounded-sm shadow-lg flex flex-col mb-3">
+        <div className="w-80 h-96 bg-white border border-line rounded-md shadow-lift flex flex-col mb-3">
           <div className="bg-ink text-paper px-4 py-3 flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium">MaanVerify Assistant</p>
+              <p className="text-sm font-medium">MaanDrishti Assistant</p>
               <p className="text-xs text-paper/60 capitalize">{roleLabel[user.role]} view</p>
             </div>
             <button onClick={() => setOpen(false)} className="text-paper/70 hover:text-paper text-lg leading-none">
@@ -61,7 +62,7 @@ export default function ChatWidget() {
             {messages.map((m, i) => (
               <div
                 key={i}
-                className={`text-sm rounded-sm px-3 py-2 max-w-[85%] ${
+                className={`text-sm rounded-md px-3 py-2 max-w-[85%] ${
                   m.role === "user" ? "bg-ink text-paper ml-auto" : "bg-paperdim text-ink"
                 }`}
               >
@@ -88,10 +89,10 @@ export default function ChatWidget() {
 
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-14 h-14 rounded-full bg-ink text-paper shadow-lg flex items-center justify-center text-2xl hover:bg-inkdeep"
+        className="w-14 h-14 rounded-full bg-ink text-paper shadow-lift flex items-center justify-center hover:bg-inkdeep transition-all hover:-translate-y-0.5 ring-2 ring-brass/30"
         aria-label="Open assistant"
       >
-        {open ? "×" : "💬"}
+        {open ? <span className="text-2xl leading-none">×</span> : <ChatIcon className="w-6 h-6" />}
       </button>
     </div>
   );

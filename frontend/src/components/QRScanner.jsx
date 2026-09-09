@@ -49,7 +49,7 @@ export default function QRScanner({ onResult, onError }) {
 
   return (
     <div>
-      <div id={containerId} className="w-full max-w-sm mx-auto rounded-sm overflow-hidden border border-line" />
+      <div id={containerId} className="w-full max-w-sm mx-auto rounded-md overflow-hidden border border-line" />
       {err && <p className="text-danger text-sm mt-2">{err}</p>}
       <div className="mt-3 flex justify-center gap-3">
         {!active ? (

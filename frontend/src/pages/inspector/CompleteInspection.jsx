@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../api/axios.js";
 import EvidenceCapture from "../../components/EvidenceCapture.jsx";
+import EmptyState from "../../components/EmptyState.jsx";
+import { InstrumentIcon, ShieldCheckIcon } from "../../components/Icons.jsx";
 
 export default function CompleteInspection() {
   const { id } = useParams();
@@ -67,6 +69,9 @@ export default function CompleteInspection() {
     return (
       <div className="max-w-2xl mx-auto px-6 py-10">
         <div className="card text-center">
+          <span className="page-icon-badge mx-auto mb-3">
+            <ShieldCheckIcon className="w-5 h-5" />
+          </span>
           <h2 className="text-xl mb-2">Inspection recorded</h2>
           <p className="mb-2">
             Result:{" "}
@@ -103,15 +108,29 @@ export default function CompleteInspection() {
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-10">
-      <h1 className="text-2xl mb-1">Conduct inspection</h1>
-      <p className="text-ink/60 text-sm mb-6">{inspection.shop?.shopName}</p>
+      <div className="flex items-center gap-3 mb-6">
+        <span className="page-icon-badge">
+          <InstrumentIcon className="w-5 h-5" />
+        </span>
+        <div>
+          <h1 className="text-2xl">Conduct inspection</h1>
+          <p className="text-ink/60 text-sm">{inspection.shop?.shopName}</p>
+        </div>
+      </div>
 
       <form onSubmit={submit} className="space-y-6">
         {instruments.map((inst) => (
           <div key={inst._id} className="card">
-            <p className="font-medium mb-3">
-              {inst.instrumentType} <span className="text-ink/50 font-mono text-sm">({inst.serialNumber})</span>
-            </p>
+            <div className="flex items-center justify-between mb-3">
+              <p className="font-medium">
+                {inst.instrumentType} <span className="text-ink/50 font-mono text-sm">({inst.serialNumber})</span>
+              </p>
+              {inst.verificationStatus === "verified" && (
+                <span className="seal-compliant" title="Already verified in a previous inspection - only fill this in if you're re-checking it">
+                  Already verified
+                </span>
+              )}
+            </div>
             <div className="grid grid-cols-3 gap-4 mb-4">
               <div>
                 <label className="field-label">Expected value</label>
@@ -144,7 +163,7 @@ export default function CompleteInspection() {
         ))}
 
         {instruments.length === 0 && (
-          <p className="text-ink/50 text-center py-6">This shop has no registered instruments yet.</p>
+          <EmptyState icon={<InstrumentIcon className="w-8 h-8" />} title="This shop has no registered instruments yet." />
         )}
 
         <div className="card">

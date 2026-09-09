@@ -1,4 +1,4 @@
-# MaanVerify — Online Verification System for Weighing & Measuring Instruments
+# MaanDrishti — Online Verification System for Weighing & Measuring Instruments
 
 SIH prototype (PS SIH26036 · Ministry of Consumer Affairs, Dept. of Consumer Affairs).
 A digital lifecycle platform for legal-metrology verification: businesses register
@@ -11,7 +11,7 @@ required anywhere in the stack.**
 
 ## What's built vs. what's a lightweight stand-in
 
-The full "MaanVerify" vision (see the two spec docs this was built from) describes a
+The full "MaanDrishti" vision (see the two spec docs this was built from) describes a
 video-based AI evidence-verification engine (AEVE) using YOLO + OpenCV + a Python
 FastAPI microservice to analyze inspection videos frame-by-frame. That's genuinely out
 of scope for a 9-day, zero-budget hackathon build — training/hosting real object

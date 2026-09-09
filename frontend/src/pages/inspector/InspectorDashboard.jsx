@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../../api/axios.js";
 import { useAuth } from "../../context/AuthContext.jsx";
+import PageHeader from "../../components/PageHeader.jsx";
+import EmptyState from "../../components/EmptyState.jsx";
+import { InspectorIcon, CalendarIcon, MapPinIcon, BellIcon, ShopIcon } from "../../components/Icons.jsx";
 
 export default function InspectorDashboard() {
   const { user } = useAuth();
@@ -33,6 +36,9 @@ export default function InspectorDashboard() {
     return (
       <div className="max-w-md mx-auto mt-16 px-6 text-center">
         <div className="card">
+          <span className="page-icon-badge mx-auto mb-3">
+            <BellIcon className="w-5 h-5" />
+          </span>
           <h2 className="text-xl mb-2">Approval pending</h2>
           <p className="text-sm text-ink/70">
             Your inspector registration is on file with your location and availability, but a
@@ -47,6 +53,9 @@ export default function InspectorDashboard() {
     return (
       <div className="max-w-md mx-auto mt-16 px-6 text-center">
         <div className="card">
+          <span className="page-icon-badge mx-auto mb-3 !border-danger/30 !text-danger">
+            <BellIcon className="w-5 h-5" />
+          </span>
           <h2 className="text-xl mb-2">Registration not approved</h2>
           <p className="text-sm text-ink/70">
             A government admin has not approved this inspector account. Contact the department if
@@ -59,19 +68,28 @@ export default function InspectorDashboard() {
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-10">
-      <h1 className="text-2xl mb-1">Inspector dashboard</h1>
-      <p className="text-ink/60 text-sm mb-6">Manage your availability and complete assigned inspections.</p>
+      <PageHeader
+        icon={<InspectorIcon className="w-5 h-5" />}
+        eyebrow="Inspector dashboard"
+        title="Manage inspections & availability"
+        subtitle="Manage your availability and complete assigned inspections."
+      />
 
       <div className="flex gap-2 mb-6 border-b border-line">
-        {["inspections", "find", "slots"].map((t) => (
+        {[
+          ["inspections", <InspectorIcon key="i" className="w-4 h-4" />, "Assigned inspections"],
+          ["find", <MapPinIcon key="f" className="w-4 h-4" />, "Find shops to inspect"],
+          ["slots", <CalendarIcon key="s" className="w-4 h-4" />, "My availability"],
+        ].map(([t, icon, label]) => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`px-4 py-2 text-sm capitalize border-b-2 -mb-px ${
-              tab === t ? "border-brass text-inkdeep" : "border-transparent text-ink/50"
+            className={`flex items-center gap-1.5 px-4 py-2 text-sm border-b-2 -mb-px transition-colors ${
+              tab === t ? "border-brass text-inkdeep" : "border-transparent text-ink/50 hover:text-ink/70"
             }`}
           >
-            {t === "slots" ? "My availability" : t === "find" ? "Find shops to inspect" : "Assigned inspections"}
+            {icon}
+            {label}
           </button>
         ))}
       </div>
@@ -107,7 +125,9 @@ export default function InspectorDashboard() {
               )}
             </div>
           ))}
-          {inspections.length === 0 && <p className="text-ink/50 text-center py-8">No inspections assigned yet.</p>}
+          {inspections.length === 0 && (
+            <EmptyState icon={<InspectorIcon className="w-8 h-8" />} title="No inspections assigned yet." />
+          )}
         </div>
       )}
 
@@ -146,19 +166,26 @@ function FindShopsTab({ shops, mySlots, onAssigned }) {
         <div className="grid gap-2">
           {shops.map((s) => (
             <div key={s._id} className="card !p-3 flex items-center justify-between">
-              <div>
-                <p className="font-medium text-sm">{s.shopName}</p>
-                <p className="text-xs text-ink/60">
-                  {s.city}, {s.state}
-                  {s.sameCity ? " · same city" : s.distanceKm != null ? ` · ${s.distanceKm.toFixed(1)} km` : ""}
-                </p>
+              <div className="flex items-center gap-2.5">
+                <span className="page-icon-badge !w-8 !h-8">
+                  <ShopIcon className="w-4 h-4" />
+                </span>
+                <div>
+                  <p className="font-medium text-sm">{s.shopName}</p>
+                  <p className="text-xs text-ink/60">
+                    {s.city}, {s.state}
+                    {s.sameCity ? " · same city" : s.distanceKm != null ? ` · ${s.distanceKm.toFixed(1)} km` : ""}
+                  </p>
+                </div>
               </div>
               <button className="btn-brass !py-1.5" onClick={() => setSelectedShop(s)}>
                 Inspect
               </button>
             </div>
           ))}
-          {shops.length === 0 && <p className="text-ink/50 text-center py-8">No shops currently need inspection.</p>}
+          {shops.length === 0 && (
+            <EmptyState icon={<ShopIcon className="w-8 h-8" />} title="No shops currently need inspection." />
+          )}
         </div>
       </div>
 
@@ -175,7 +202,7 @@ function FindShopsTab({ shops, mySlots, onAssigned }) {
               {mySlots.map((s) => (
                 <label
                   key={s._id}
-                  className={`flex items-center border rounded-sm px-3 py-2 text-sm cursor-pointer ${
+                  className={`flex items-center border rounded-md px-3 py-2 text-sm cursor-pointer ${
                     slotId === s._id ? "border-brass bg-paperdim/50" : "border-line"
                   }`}
                 >

@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import ChatWidget from "./components/ChatWidget.jsx";
+import GovStrip from "./components/GovStrip.jsx";
 
 import Home from "./pages/Home.jsx";
 import Login from "./pages/Login.jsx";
@@ -26,6 +27,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 export default function App() {
   return (
     <div className="min-h-screen flex flex-col">
+      <GovStrip />
       <Navbar />
       <main className="flex-1">
         <Routes>
@@ -99,7 +101,7 @@ export default function App() {
         </Routes>
       </main>
       <footer className="border-t border-line py-6 text-center text-xs text-ink/40">
-        MaanVerify — SIH prototype for online verification of weighing &amp; measuring instruments
+        MaanDrishti — SIH prototype for online verification of weighing &amp; measuring instruments
       </footer>
       <ChatWidget />
     </div>

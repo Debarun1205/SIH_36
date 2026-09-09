@@ -3,6 +3,20 @@ import api from "../../api/axios.js";
 import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import PageHeader from "../../components/PageHeader.jsx";
+import EmptyState from "../../components/EmptyState.jsx";
+import StatCard from "../../components/StatCard.jsx";
+import {
+  GovIcon,
+  InspectorIcon,
+  FlagIcon,
+  MapPinIcon,
+  ShopIcon,
+  CertificateIcon,
+  ShieldCheckIcon,
+  TrendIcon,
+  BellIcon,
+} from "../../components/Icons.jsx";
 
 const statusColor = { compliant: "#3F6B4A", "non-compliant": "#9B3B3B", pending: "#A6631E", unverified: "#8A8577" };
 
@@ -10,30 +24,35 @@ export default function AdminDashboard() {
   const [tab, setTab] = useState("overview");
 
   const tabs = [
-    ["overview", "Overview"],
-    ["approvals", "Inspector Approvals"],
-    ["applications", "Applications"],
-    ["map", "Map"],
-    ["inspectors", "Inspectors"],
-    ["tolerance", "Tolerance rules"],
-    ["review", "Review queue"],
-    ["complaints", "Complaints"],
+    ["overview", "Overview", <TrendIcon key="o" className="w-4 h-4" />],
+    ["approvals", "Inspector Approvals", <BellIcon key="a" className="w-4 h-4" />],
+    ["applications", "Applications", <FlagIcon key="ap" className="w-4 h-4" />],
+    ["map", "Map", <MapPinIcon key="m" className="w-4 h-4" />],
+    ["inspectors", "Inspectors", <InspectorIcon key="i" className="w-4 h-4" />],
+    ["tolerance", "Tolerance rules", <ShieldCheckIcon key="t" className="w-4 h-4" />],
+    ["review", "Review queue", <CertificateIcon key="r" className="w-4 h-4" />],
+    ["complaints", "Complaints", <FlagIcon key="c" className="w-4 h-4" />],
   ];
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-10">
-      <h1 className="text-2xl mb-1">Admin dashboard</h1>
-      <p className="text-ink/60 text-sm mb-6">Compliance monitoring, inspector management, and configuration.</p>
+      <PageHeader
+        icon={<GovIcon className="w-5 h-5" />}
+        eyebrow="Government dashboard"
+        title="Admin dashboard"
+        subtitle="Compliance monitoring, inspector management, and configuration."
+      />
 
       <div className="flex gap-1 mb-6 border-b border-line flex-wrap">
-        {tabs.map(([key, label]) => (
+        {tabs.map(([key, label, icon]) => (
           <button
             key={key}
             onClick={() => setTab(key)}
-            className={`px-4 py-2 text-sm border-b-2 -mb-px ${
-              tab === key ? "border-brass text-inkdeep" : "border-transparent text-ink/50"
+            className={`flex items-center gap-1.5 px-4 py-2 text-sm border-b-2 -mb-px transition-colors ${
+              tab === key ? "border-brass text-inkdeep" : "border-transparent text-ink/50 hover:text-ink/70"
             }`}
           >
+            {icon}
             {label}
           </button>
         ))}
@@ -66,18 +85,11 @@ function Overview() {
   return (
     <div>
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-        {[
-          ["Total shops", s.totalShops],
-          ["Compliant", s.compliantShops],
-          ["Non-compliant", s.nonCompliantShops],
-          ["Pending", s.pendingShops],
-          ["Certificates issued", s.totalCertificates],
-        ].map(([label, value]) => (
-          <div key={label} className="card text-center">
-            <p className="text-3xl font-serif text-inkdeep">{value}</p>
-            <p className="text-xs text-ink/60 mt-1">{label}</p>
-          </div>
-        ))}
+        <StatCard icon={<ShopIcon className="w-5 h-5" />} value={s.totalShops} label="Total shops" />
+        <StatCard icon={<ShieldCheckIcon className="w-5 h-5" />} value={s.compliantShops} label="Compliant" />
+        <StatCard icon={<FlagIcon className="w-5 h-5" />} value={s.nonCompliantShops} label="Non-compliant" />
+        <StatCard icon={<BellIcon className="w-5 h-5" />} value={s.pendingShops} label="Pending" />
+        <StatCard icon={<CertificateIcon className="w-5 h-5" />} value={s.totalCertificates} label="Certificates issued" />
       </div>
 
       <h2 className="text-lg mb-3">Verification trends (last 8 weeks)</h2>
@@ -145,7 +157,7 @@ function InspectorApprovals() {
           <div key={i._id} className="card flex items-center justify-between">
             <div className="flex gap-4 items-center">
               {i.govtIdDocument && i.govtIdDocument.startsWith("data:image") && (
-                <img src={i.govtIdDocument} alt="Govt ID" className="w-16 h-16 object-cover rounded-sm border border-line" />
+                <img src={i.govtIdDocument} alt="Govt ID" className="w-16 h-16 object-cover rounded-md border border-line" />
               )}
               <div>
                 <p className="font-medium">{i.name}</p>
@@ -170,7 +182,9 @@ function InspectorApprovals() {
             </div>
           </div>
         ))}
-        {pending.length === 0 && <p className="text-ink/50 text-center py-8">No pending inspector registrations.</p>}
+        {pending.length === 0 && (
+          <EmptyState icon={<BellIcon className="w-8 h-8" />} title="No pending inspector registrations." />
+        )}
       </div>
     </div>
   );
@@ -231,7 +245,7 @@ function Applications() {
               </button>
             </div>
           ))}
-          {applications.length === 0 && <p className="text-ink/50 text-center py-8">No pending requests.</p>}
+          {applications.length === 0 && <EmptyState icon={<FlagIcon className="w-8 h-8" />} title="No pending requests." />}
         </div>
       </div>
 
@@ -247,7 +261,7 @@ function Applications() {
               {suggestions?.map((s) => (
                 <label
                   key={s.inspector.id}
-                  className={`flex items-center justify-between border rounded-sm px-3 py-2 text-sm cursor-pointer ${
+                  className={`flex items-center justify-between border rounded-md px-3 py-2 text-sm cursor-pointer ${
                     form.inspectorId === s.inspector.id ? "border-brass bg-paperdim/50" : "border-line"
                   }`}
                 >
@@ -374,11 +388,27 @@ function Inspectors() {
         <h3 className="font-serif text-lg mb-3">Current inspectors</h3>
         <div className="grid gap-2">
           {inspectors.map((i) => (
-            <div key={i._id} className="card !p-3">
-              <p className="font-medium text-sm">{i.name}</p>
-              <p className="text-xs text-ink/60">{i.email}</p>
+            <div key={i._id} className="card !p-3 flex items-center justify-between">
+              <div>
+                <p className="font-medium text-sm">{i.name}</p>
+                <p className="text-xs text-ink/60">{i.email}</p>
+              </div>
+              <span
+                className={
+                  i.approvalStatus === "approved"
+                    ? "seal-compliant"
+                    : i.approvalStatus === "rejected"
+                    ? "seal-noncompliant"
+                    : "seal-pending"
+                }
+              >
+                {i.approvalStatus}
+              </span>
             </div>
           ))}
+          {inspectors.length === 0 && (
+            <EmptyState icon={<InspectorIcon className="w-8 h-8" />} title="No inspector accounts yet." />
+          )}
         </div>
       </div>
     </div>
@@ -517,7 +547,7 @@ function ReviewQueue() {
             return (
               <div key={idx} className="text-sm border-t border-line pt-3 mt-3 flex gap-4">
                 {c.evidenceImage && (
-                  <img src={c.evidenceImage} alt="evidence" className="w-20 h-20 rounded-sm border border-line flex-shrink-0" />
+                  <img src={c.evidenceImage} alt="evidence" className="w-20 h-20 rounded-md border border-line flex-shrink-0" />
                 )}
                 <div className="flex-1">
                   <p className={`font-medium ${verdict.tone}`}>
@@ -530,7 +560,7 @@ function ReviewQueue() {
                     {expandedRaw[key] ? "Hide technical details" : "Show technical details"}
                   </button>
                   {expandedRaw[key] && (
-                    <p className="text-xs font-mono text-ink/50 mt-1 bg-paperdim/50 rounded-sm p-2">
+                    <p className="text-xs font-mono text-ink/50 mt-1 bg-paperdim/50 rounded-md p-2">
                       Raw OCR text: {c.ocrExtractedReading || "(none detected)"}
                     </p>
                   )}
@@ -565,7 +595,9 @@ function ReviewQueue() {
           </div>
         </div>
       ))}
-      {inspections.length === 0 && <p className="text-ink/50 text-center py-8">No cases pending review.</p>}
+      {inspections.length === 0 && (
+        <EmptyState icon={<CertificateIcon className="w-8 h-8" />} title="No cases pending review." />
+      )}
     </div>
   );
 }
@@ -600,7 +632,7 @@ function Complaints() {
           <p className="text-sm text-ink/70">{c.description}</p>
         </div>
       ))}
-      {complaints.length === 0 && <p className="text-ink/50 text-center py-8">No complaints filed yet.</p>}
+      {complaints.length === 0 && <EmptyState icon={<FlagIcon className="w-8 h-8" />} title="No complaints filed yet." />}
     </div>
   );
 }

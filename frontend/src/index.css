@@ -13,28 +13,44 @@
 
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-sm px-4 py-2 text-sm font-medium transition-colors border;
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all duration-150 border;
   }
   .btn-primary {
-    @apply btn bg-ink text-paper border-ink hover:bg-inkdeep;
+    @apply btn bg-ink text-paper border-ink hover:bg-inkdeep hover:shadow-soft hover:-translate-y-px;
   }
   .btn-brass {
-    @apply btn bg-brass text-paper border-brass hover:bg-[#9C7231];
+    @apply btn bg-brass text-paper border-brass hover:bg-[#9C7231] hover:shadow-soft hover:-translate-y-px;
   }
   .btn-outline {
-    @apply btn bg-transparent text-ink border-line hover:border-ink;
+    @apply btn bg-transparent text-ink border-line hover:border-ink hover:bg-ink/[0.03];
   }
+
   .card {
-    @apply bg-white border border-line rounded-sm p-6;
+    @apply bg-white border border-line rounded-md p-6 shadow-soft;
   }
+  /* Opt-in variant for certificate/official-document-adjacent surfaces - a
+     thin brass top accent evokes a seal/letterhead without being loud. */
+  .card-official {
+    @apply card border-t-[3px] border-t-brass;
+  }
+  .card-hover {
+    @apply transition-all duration-150 hover:shadow-lift hover:-translate-y-0.5 hover:border-brass/40;
+  }
+  /* Slightly warmer, recessed surface for grouping content within a page
+     (tab panels, secondary panels) without competing with .card. */
+  .panel-warm {
+    @apply bg-paperwarm border border-line rounded-md p-6;
+  }
+
   .field-label {
     @apply block text-sm font-medium text-ink mb-1;
   }
   .field-input {
-    @apply w-full border border-line rounded-sm px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brass/50 focus:border-brass;
+    @apply w-full border border-line rounded-md px-3 py-2 bg-white transition-shadow focus:outline-none focus:ring-2 focus:ring-brass/50 focus:border-brass;
   }
+
   .seal-badge {
-    @apply inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium tracking-wide;
+    @apply inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium tracking-wide shadow-sm;
   }
   .seal-compliant {
     @apply seal-badge bg-[#EAF1EB] text-ok border-ok/30;
@@ -48,6 +64,7 @@
   .seal-unverified {
     @apply seal-badge bg-paperdim text-ink/60 border-line;
   }
+
   .ledger-table {
     @apply w-full text-sm border-collapse;
   }
@@ -56,5 +73,50 @@
   }
   .ledger-table td {
     @apply border-b border-line py-3 pr-4;
+  }
+
+  /* Small pill used for the government identification strip and trust badges */
+  .gov-pill {
+    @apply inline-flex items-center gap-1.5 text-xs tracking-wide px-2.5 py-1 rounded-full border border-white/15 text-paper/90;
+  }
+
+  /* Subtle dot-grid watermark for hero/landing sections - official-letterhead
+     texture. Low alpha is deliberate: at full color it fights with text
+     sitting on top of it. */
+  .hero-pattern {
+    background-image: radial-gradient(circle, rgba(184, 134, 47, 0.16) 1.5px, transparent 1.5px);
+    background-size: 24px 24px;
+    background-position: center;
+  }
+
+  /* Page header: icon badge used at the top of every dashboard/page */
+  .page-icon-badge {
+    @apply w-11 h-11 rounded-full bg-paperdim border border-brass/30 flex items-center justify-center text-brass flex-shrink-0;
+  }
+
+  /* Stat card used on dashboard overview rows */
+  .stat-card {
+    @apply card text-center;
+  }
+  .stat-card .stat-value {
+    @apply text-3xl font-serif text-inkdeep;
+  }
+  .stat-card .stat-label {
+    @apply text-xs text-ink/60 mt-1;
+  }
+
+  /* Empty state block - icon + message, replacing bare "nothing here" text */
+  .empty-state {
+    @apply card text-center py-12 text-ink/60 flex flex-col items-center gap-3;
+  }
+}
+
+@layer utilities {
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-fade-up {
+    animation: fade-up 0.5s ease-out both;
   }
 }

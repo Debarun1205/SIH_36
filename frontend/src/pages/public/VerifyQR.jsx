@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../api/axios.js";
 import QRScanner from "../../components/QRScanner.jsx";
+import CertificateDocument from "../../components/CertificateDocument.jsx";
+import { ShieldCheckIcon } from "../../components/Icons.jsx";
 
 const statusSeal = (status) => {
   const map = {
@@ -63,13 +65,16 @@ export default function VerifyQR() {
 
   return (
     <div className="max-w-2xl mx-auto px-6 mt-12">
+      <span className="page-icon-badge mb-3">
+        <ShieldCheckIcon className="w-5 h-5" />
+      </span>
       <h1 className="text-2xl mb-1">Verify an instrument or shop</h1>
       <p className="text-ink/60 text-sm mb-6">
         Scan the QR code on a shop's compliance certificate, or enter the ID manually.
       </p>
 
       {!routeType && (
-        <div className="card mb-6">
+        <div className="card-official mb-6">
           <QRScanner onResult={handleScanResult} />
 
           <div className="border-t border-line mt-6 pt-6">
@@ -94,8 +99,16 @@ export default function VerifyQR() {
       {loading && <p className="text-ink/60">Checking…</p>}
       {error && <p className="text-danger">{error}</p>}
 
-      {result && (
-        <div className="card">
+      {result && result.type === "certificate" && (
+        <CertificateDocument
+          certificate={result.certificate}
+          currentlyValid={result.currentlyValid}
+          integrityVerified={result.integrityVerified}
+        />
+      )}
+
+      {result && result.type !== "certificate" && (
+        <div className="card-official">
           {result.type === "shop" && (
             <>
               <div className="flex items-center justify-between mb-4">
@@ -104,9 +117,12 @@ export default function VerifyQR() {
                   {result.shop.complianceStatus.toUpperCase()}
                 </span>
               </div>
-              <p className="text-sm text-ink/70 mb-4">
+              <p className="text-sm text-ink/70 mb-1">
                 {result.shop.address}, {result.shop.city}, {result.shop.state}
               </p>
+              {result.shop.licenseNumber && (
+                <p className="text-sm text-ink/70 mb-4">License No: {result.shop.licenseNumber}</p>
+              )}
               {result.certificate ? (
                 <div className="text-sm border-t border-line pt-4">
                   <p>Certificate: <span className="font-mono">{result.certificate.certificateId}</span></p>
@@ -145,23 +161,6 @@ export default function VerifyQR() {
                   </ul>
                 </div>
               )}
-            </>
-          )}
-
-          {result.type === "certificate" && (
-            <>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl">Certificate {result.certificate.certificateId}</h2>
-                <span className={result.currentlyValid ? "seal-compliant" : "seal-noncompliant"}>
-                  {result.currentlyValid ? "VALID" : "NOT VALID"}
-                </span>
-              </div>
-              <p className="text-sm">Shop: {result.certificate.shop?.shopName}</p>
-              <p className="text-sm">Issued: {new Date(result.certificate.issueDate).toLocaleDateString()}</p>
-              <p className="text-sm">Valid until: {new Date(result.certificate.validUntil).toLocaleDateString()}</p>
-              <p className="text-sm mt-2">
-                Tamper check: {result.integrityVerified ? <span className="text-ok">passed</span> : <span className="text-danger">FAILED — record may have been altered</span>}
-              </p>
             </>
           )}
 

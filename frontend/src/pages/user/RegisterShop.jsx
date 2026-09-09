@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios.js";
+import { ShopIcon } from "../../components/Icons.jsx";
 
 export default function RegisterShop() {
   const navigate = useNavigate();
@@ -47,10 +48,13 @@ export default function RegisterShop() {
 
   return (
     <div className="max-w-lg mx-auto px-6 py-10">
+      <span className="page-icon-badge mb-3">
+        <ShopIcon className="w-5 h-5" />
+      </span>
       <h1 className="text-2xl mb-1">Register a shop</h1>
       <p className="text-ink/60 text-sm mb-6">This creates the shop's digital identity and QR code.</p>
 
-      <form onSubmit={submit} className="card space-y-4">
+      <form onSubmit={submit} className="card-official space-y-4">
         <div>
           <label className="field-label">Shop name</label>
           <input className="field-input" value={form.shopName} onChange={set("shopName")} required />

@@ -8,7 +8,7 @@ import Complaint from "../models/Complaint.js";
 import User from "../models/User.js";
 import { askGroq } from "../utils/groqClient.js";
 
-const PLATFORM_BLURB = `MaanVerify is a digital verification platform for weighing and measuring
+const PLATFORM_BLURB = `MaanDrishti is a digital verification platform for weighing and measuring
 instruments (SIH26036). Businesses register shops and instruments; inspectors
 verify them on-site; compliant results get a tamper-evident certificate with a
 QR code; citizens can scan that QR to check a shop's status instantly.`;
@@ -110,7 +110,7 @@ export const askChatbot = async (req, res) => {
 
     const systemPrompt = `${PLATFORM_BLURB}
 
-You are the MaanVerify assistant, currently helping a logged-in "${req.user.role}" named ${req.user.name}.
+You are the MaanDrishti assistant, currently helping a logged-in "${req.user.role}" named ${req.user.name}.
 ${ROLE_SCOPE_NOTE[req.user.role]}
 If asked for anything outside this scope, politely explain you can only help with things relevant to their own account and role.
 

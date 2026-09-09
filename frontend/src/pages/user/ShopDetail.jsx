@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "../../api/axios.js";
 import EvidenceCapture from "../../components/EvidenceCapture.jsx";
+import CertificateDocument from "../../components/CertificateDocument.jsx";
+import EmptyState from "../../components/EmptyState.jsx";
+import { ShopIcon, InstrumentIcon, ProductIcon, CalendarIcon, FlagIcon, CertificateIcon } from "../../components/Icons.jsx";
 
 export default function ShopDetail() {
   const { id } = useParams();
@@ -44,26 +47,40 @@ export default function ShopDetail() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-10">
       <div className="flex items-start justify-between mb-6">
-        <div>
-          <h1 className="text-2xl">{shop.shopName}</h1>
-          <p className="text-ink/60 text-sm">
-            {shop.address}, {shop.city}, {shop.state}
-          </p>
+        <div className="flex items-center gap-3">
+          <span className="page-icon-badge">
+            <ShopIcon className="w-5 h-5" />
+          </span>
+          <div>
+            <h1 className="text-2xl">{shop.shopName}</h1>
+            <p className="text-ink/60 text-sm">
+              {shop.address}, {shop.city}, {shop.state}
+            </p>
+          </div>
         </div>
         {shop.qrCode && (
-          <img src={shop.qrCode} alt="Shop QR" className="w-24 h-24 border border-line rounded-sm" />
+          <div className="text-center">
+            <img src={shop.qrCode} alt="Shop QR" className="w-24 h-24 border border-line rounded-md p-1 bg-white shadow-soft" />
+          </div>
         )}
       </div>
 
       <div className="flex gap-2 mb-6 border-b border-line">
-        {["instruments", "products", "book", "apply", "certificates"].map((t) => (
+        {[
+          ["instruments", <InstrumentIcon key="i" className="w-4 h-4" />],
+          ["products", <ProductIcon key="p" className="w-4 h-4" />],
+          ["book", <CalendarIcon key="b" className="w-4 h-4" />],
+          ["apply", <FlagIcon key="a" className="w-4 h-4" />],
+          ["certificates", <CertificateIcon key="c" className="w-4 h-4" />],
+        ].map(([t, icon]) => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`px-4 py-2 text-sm capitalize border-b-2 -mb-px ${
-              tab === t ? "border-brass text-inkdeep" : "border-transparent text-ink/50"
+            className={`flex items-center gap-1.5 px-4 py-2 text-sm capitalize border-b-2 -mb-px transition-colors ${
+              tab === t ? "border-brass text-inkdeep" : "border-transparent text-ink/50 hover:text-ink/70"
             }`}
           >
+            {icon}
             {t === "book" ? "Book a slot myself" : t === "apply" ? "Request inspection" : t === "products" ? "Items sold" : t}
           </button>
         ))}
@@ -167,13 +184,25 @@ function InstrumentsTab({ shopId, instruments, onAdded }) {
             <tr key={i._id}>
               <td>{i.instrumentType}</td>
               <td className="font-mono">{i.serialNumber}</td>
-              <td className="capitalize">{i.verificationStatus}</td>
+              <td>
+                <span
+                  className={
+                    i.verificationStatus === "verified"
+                      ? "seal-compliant"
+                      : i.verificationStatus === "rejected"
+                      ? "seal-noncompliant"
+                      : "seal-unverified"
+                  }
+                >
+                  {i.verificationStatus}
+                </span>
+              </td>
               <td>{i.qrCode && <img src={i.qrCode} className="w-10 h-10" alt="qr" />}</td>
             </tr>
           ))}
           {instruments.length === 0 && (
             <tr>
-              <td colSpan={4} className="text-ink/50 py-6 text-center">
+              <td colSpan={4} className="text-ink/50 py-8 text-center">
                 No instruments registered yet.
               </td>
             </tr>
@@ -262,7 +291,7 @@ function ProductsTab({ shopId }) {
           ))}
           {products.length === 0 && (
             <tr>
-              <td colSpan={4} className="text-ink/50 py-6 text-center">
+              <td colSpan={4} className="text-ink/50 py-8 text-center">
                 No items listed yet.
               </td>
             </tr>
@@ -310,7 +339,9 @@ function BookTab({ shopId, slots, onBooked }) {
             </button>
           </div>
         ))}
-        {slots.length === 0 && <p className="text-ink/50 text-center py-8">No open inspection slots nearby right now.</p>}
+        {slots.length === 0 && (
+          <EmptyState icon={<CalendarIcon className="w-8 h-8" />} title="No open inspection slots nearby right now." />
+        )}
       </div>
     </div>
   );
@@ -373,7 +404,9 @@ function ApplyTab({ shopId, applications, onApplied }) {
             <span className={a.status === "assigned" ? "seal-compliant" : "seal-pending"}>{a.status}</span>
           </div>
         ))}
-        {applications.length === 0 && <p className="text-ink/50 text-center py-8">No inspection requests yet.</p>}
+        {applications.length === 0 && (
+          <EmptyState icon={<FlagIcon className="w-8 h-8" />} title="No inspection requests yet." />
+        )}
       </div>
     </div>
   );
@@ -381,20 +414,13 @@ function ApplyTab({ shopId, applications, onApplied }) {
 
 function CertificatesTab({ certificates }) {
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-8">
       {certificates.map((c) => (
-        <div key={c._id} className="card flex items-center justify-between">
-          <div>
-            <p className="font-mono text-sm">{c.certificateId}</p>
-            <p className="text-sm text-ink/60">
-              Valid: {new Date(c.issueDate).toLocaleDateString()} – {new Date(c.validUntil).toLocaleDateString()}
-            </p>
-            <span className={c.status === "active" ? "seal-compliant" : "seal-noncompliant"}>{c.status}</span>
-          </div>
-          {c.qrCode && <img src={c.qrCode} className="w-20 h-20" alt="certificate qr" />}
-        </div>
+        <CertificateDocument key={c._id} certificate={c} />
       ))}
-      {certificates.length === 0 && <p className="text-ink/50 text-center py-8">No certificates issued yet.</p>}
+      {certificates.length === 0 && (
+        <EmptyState icon={<CertificateIcon className="w-8 h-8" />} title="No certificates issued yet." />
+      )}
     </div>
   );
 }
