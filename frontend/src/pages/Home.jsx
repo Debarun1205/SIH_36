@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ShieldCheckIcon, ShopIcon, InspectorIcon, CertificateIcon } from "../components/Icons.jsx";
+import { ShopIcon, InspectorIcon, CertificateIcon } from "../components/Icons.jsx";
 
 const steps = [
   {
@@ -25,8 +25,8 @@ export default function Home() {
     <div>
       <div className="hero-pattern border-b border-line">
         <div className="max-w-3xl mx-auto px-6 pt-20 pb-16 text-center animate-fade-up">
-          <div className="w-14 h-14 rounded-full bg-white border-2 border-brass shadow-soft flex items-center justify-center mx-auto mb-5">
-            <ShieldCheckIcon className="w-7 h-7 text-brass" />
+         <div className="w-16 h-16 rounded-2xl bg-white border-2 border-brass shadow-soft flex items-center justify-center mx-auto mb-5 overflow-hidden">
+            <img src="/logo.png" alt="MaanDrishti logo" className="w-full h-full object-cover" />
           </div>
 
           <span className="text-brass text-sm tracking-wide">Legal Metrology · Digital Verification</span>

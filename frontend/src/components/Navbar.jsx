@@ -26,9 +26,11 @@ export default function Navbar() {
     <header className="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         <Link to={user ? roleHome[user.role] : "/"} className="flex items-center gap-2.5">
-          <span className="w-9 h-9 rounded-full bg-ink text-paper flex items-center justify-center font-serif font-semibold text-sm shadow-sm ring-2 ring-brass/40">
-            MD
-          </span>
+         <img
+            src="/logo.png"
+            alt="MaanDrishti logo"
+            className="w-9 h-9 rounded-full shadow-sm ring-2 ring-brass/40 object-cover"
+          />
           <span className="font-serif text-lg text-inkdeep">MaanDrishti</span>
         </Link>
 
